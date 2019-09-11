@@ -7,12 +7,12 @@
   
   <title>tomcat总体框架 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
-  <meta name="description" content="tomcat总体设计最简单的分层第一阶段:如果说自己设计一个web服务器,那首先要具有3个功能:  侦听请求 listen() 处理请求 handle() 返回响应 back()  于是有了最简单的模型:  其中start()包含listen() handle() back()三个功能 stop()负责释放资源 第二阶段:但是针对不同的协议,如http协议或者集群部署时使用的ajp协议,web服务">
+  <meta name="description" content="tomcat总体设计最简单的分层第一阶段:如果说自己设计一个web服务器,那首先要具有3个功能:  侦听请求 listen() 处理请求 handle() 返回响应 back()  于是有了最简单的模型:  其中start()包含listen() handle() back()三个功能 stop()负责释放资源">
 <meta property="og:type" content="article">
 <meta property="og:title" content="tomcat总体框架">
 <meta property="og:url" content="http://yoursite.com/2019/09/11/tomcat总体框架/index.html">
 <meta property="og:site_name" content="Hexo">
-<meta property="og:description" content="tomcat总体设计最简单的分层第一阶段:如果说自己设计一个web服务器,那首先要具有3个功能:  侦听请求 listen() 处理请求 handle() 返回响应 back()  于是有了最简单的模型:  其中start()包含listen() handle() back()三个功能 stop()负责释放资源 第二阶段:但是针对不同的协议,如http协议或者集群部署时使用的ajp协议,web服务">
+<meta property="og:description" content="tomcat总体设计最简单的分层第一阶段:如果说自己设计一个web服务器,那首先要具有3个功能:  侦听请求 listen() 处理请求 handle() 返回响应 back()  于是有了最简单的模型:  其中start()包含listen() handle() back()三个功能 stop()负责释放资源">
 <meta property="og:locale" content="en">
 <meta property="og:image" content="http://yoursite.com/2019/09/11/tomcat总体框架/1567961389769.png">
 <meta property="og:image" content="http://yoursite.com/2019/09/11/tomcat总体框架/1567961706513.png">
@@ -22,10 +22,10 @@
 <meta property="og:image" content="http://yoursite.com/2019/09/11/tomcat总体框架/1567966318540.png">
 <meta property="og:image" content="http://yoursite.com/2019/09/11/tomcat总体框架/1567967320381.png">
 <meta property="og:image" content="http://yoursite.com/2019/09/11/tomcat总体框架/1567968262720.png">
-<meta property="og:updated_time" content="2019-09-11T14:15:48.055Z">
+<meta property="og:updated_time" content="2019-09-11T14:40:42.171Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="tomcat总体框架">
-<meta name="twitter:description" content="tomcat总体设计最简单的分层第一阶段:如果说自己设计一个web服务器,那首先要具有3个功能:  侦听请求 listen() 处理请求 handle() 返回响应 back()  于是有了最简单的模型:  其中start()包含listen() handle() back()三个功能 stop()负责释放资源 第二阶段:但是针对不同的协议,如http协议或者集群部署时使用的ajp协议,web服务">
+<meta name="twitter:description" content="tomcat总体设计最简单的分层第一阶段:如果说自己设计一个web服务器,那首先要具有3个功能:  侦听请求 listen() 处理请求 handle() 返回响应 back()  于是有了最简单的模型:  其中start()包含listen() handle() back()三个功能 stop()负责释放资源">
 <meta name="twitter:image" content="http://yoursite.com/2019/09/11/tomcat总体框架/1567961389769.png">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -105,6 +105,8 @@
 <p><img src="/2019/09/11/tomcat总体框架/1567961389769.png" alt="1567961389769"></p>
 <p>其中start()包含listen() handle() back()三个功能</p>
 <p>stop()负责释放资源</p>
+<a id="more"></a>
+
 <h4 id="第二阶段"><a href="#第二阶段" class="headerlink" title="第二阶段:"></a>第二阶段:</h4><p>但是针对不同的协议,如http协议或者集群部署时使用的ajp协议,web服务器应该能保证两个部署结构下切换时,web不需要变更,也就是要抽出一个接口专门处理请求,一个实现类对应一种请求,然后把它转成统一格式(考虑使用适配器模式,来适配不同接口/实现类为我们设置好的接口类型)</p>
 <p>这样模型就变成了</p>
 <p><img src="/2019/09/11/tomcat总体框架/1567961706513.png" alt="1567961706513"></p>
@@ -174,7 +176,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/09/11/tomcat总体框架/" data-id="ck0fd8mn00002a4iwhkwm1p3r" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/09/11/tomcat总体框架/" data-id="ck0fdk7jw0002rgiwg58y20oy" class="article-share-link">Share</a>
       
       
     </footer>
@@ -232,7 +234,7 @@
       <ul>
         
           <li>
-            <a href="/2019/09/11/mysql的一些命令/">(no title)</a>
+            <a href="/2019/09/11/mysql的一些命令/">mysql的一些命令,容易忘记的</a>
           </li>
         
           <li>

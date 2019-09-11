@@ -5,18 +5,18 @@
   
 
   
-  <title>Hexo</title>
+  <title>mysql的一些命令,容易忘记的 | Hexo</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
   <meta name="description" content="mysql的一些命令,容易忘记的添加索引123alter table 表名 add [unique | primary] index 索引名 (索引字段[, 字段2]);-- 索引名 和 索引字段 都不用加 &apos;&apos;-- primary 的话字段必须为 not null  删除索引1alter table 表名 drop index 索引名 -- 唯一索引也是用index  更改索引1alter ta">
 <meta property="og:type" content="article">
-<meta property="og:title" content="Hexo">
+<meta property="og:title" content="mysql的一些命令,容易忘记的">
 <meta property="og:url" content="http://yoursite.com/2019/09/11/mysql的一些命令/index.html">
 <meta property="og:site_name" content="Hexo">
 <meta property="og:description" content="mysql的一些命令,容易忘记的添加索引123alter table 表名 add [unique | primary] index 索引名 (索引字段[, 字段2]);-- 索引名 和 索引字段 都不用加 &apos;&apos;-- primary 的话字段必须为 not null  删除索引1alter table 表名 drop index 索引名 -- 唯一索引也是用index  更改索引1alter ta">
 <meta property="og:locale" content="en">
-<meta property="og:updated_time" content="2019-09-10T10:14:17.958Z">
+<meta property="og:updated_time" content="2019-09-11T14:39:33.181Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="Hexo">
+<meta name="twitter:title" content="mysql的一些命令,容易忘记的">
 <meta name="twitter:description" content="mysql的一些命令,容易忘记的添加索引123alter table 表名 add [unique | primary] index 索引名 (索引字段[, 字段2]);-- 索引名 和 索引字段 都不用加 &apos;&apos;-- primary 的话字段必须为 not null  删除索引1alter table 表名 drop index 索引名 -- 唯一索引也是用index  更改索引1alter ta">
   
     <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
@@ -67,12 +67,22 @@
         <section id="main"><article id="post-mysql的一些命令" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/09/11/mysql的一些命令/" class="article-date">
-  <time datetime="2019-09-11T14:34:13.828Z" itemprop="datePublished">2019-09-11</time>
+  <time datetime="2019-09-11T14:36:53.000Z" itemprop="datePublished">2019-09-11</time>
 </a>
     
   </div>
   <div class="article-inner">
     
+    
+      <header class="article-header">
+        
+  
+    <h1 class="article-title" itemprop="name">
+      mysql的一些命令,容易忘记的
+    </h1>
+  
+
+      </header>
     
     <div class="article-entry" itemprop="articleBody">
       
@@ -83,6 +93,8 @@
 <h4 id="更改索引"><a href="#更改索引" class="headerlink" title="更改索引"></a>更改索引</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">alter</span> <span class="keyword">table</span> 表名 <span class="keyword">drop</span> <span class="keyword">index</span> 索引名 , <span class="keyword">add</span> <span class="keyword">unique</span> <span class="keyword">index</span> 索引名 (索引字段)</span><br></pre></td></tr></table></figure>
 
 <h4 id="建表的时候添加普通索引"><a href="#建表的时候添加普通索引" class="headerlink" title="建表的时候添加普通索引"></a>建表的时候添加普通索引</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">在<span class="keyword">create</span> <span class="keyword">table</span> ... (</span><br><span class="line">	中,添加一行</span><br><span class="line">    <span class="keyword">index</span> 索引名 (索引字段)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<a id="more"></a>
 
 <h4 id="建表的时候添加唯一索引"><a href="#建表的时候添加唯一索引" class="headerlink" title="建表的时候添加唯一索引"></a>建表的时候添加唯一索引</h4><figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">在<span class="keyword">create</span> <span class="keyword">table</span> ... (</span><br><span class="line">	中,添加一行</span><br><span class="line">    <span class="keyword">unique</span> <span class="keyword">key</span> 索引名 (索引字段)</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
 
@@ -173,7 +185,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/09/11/mysql的一些命令/" data-id="ck0fd8mng0003a4iwp93hj3kk" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/09/11/mysql的一些命令/" data-id="ck0fdk7kg0003rgiw4939re8n" class="article-share-link">Share</a>
       
       
     </footer>
@@ -222,7 +234,7 @@
       <ul>
         
           <li>
-            <a href="/2019/09/11/mysql的一些命令/">(no title)</a>
+            <a href="/2019/09/11/mysql的一些命令/">mysql的一些命令,容易忘记的</a>
           </li>
         
           <li>
