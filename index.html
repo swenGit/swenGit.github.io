@@ -62,6 +62,43 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-test" class="article article-type-post" itemscope itemprop="blogPost">
+  <div class="article-meta">
+    <a href="/2019/09/11/test/" class="article-date">
+  <time datetime="2019-09-11T13:49:53.000Z" itemprop="datePublished">2019-09-11</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="article-title" href="/2019/09/11/test/">test</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="article-entry" itemprop="articleBody">
+      
+        <p><img src="/2019/09/11/test/1.jpg" alt="1"></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://yoursite.com/2019/09/11/test/" data-id="ck0fcm8rd00012ciwuethzteo" class="article-share-link">Share</a>
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+  
     <article id="post-tomcat总体框架" class="article article-type-post" itemscope itemprop="blogPost">
   <div class="article-meta">
     <a href="/2019/09/11/tomcat总体框架/" class="article-date">
@@ -91,12 +128,12 @@
 <li>返回响应 back()</li>
 </ol>
 <p>于是有了最简单的模型:</p>
-<p><img src="/2019/09/11/tomcat总体框架/tomcat%E6%80%BB%E4%BD%93%E6%A1%86%E6%9E%B6%5C1567961389769.png" alt="1567961389769"></p>
+<p><img src="/2019/09/11/tomcat总体框架/1567961389769.png" alt="1567961389769"></p>
 <p>其中start()包含listen() handle() back()三个功能</p>
 <p>stop()负责释放资源</p>
 <h4 id="第二阶段"><a href="#第二阶段" class="headerlink" title="第二阶段:"></a>第二阶段:</h4><p>但是针对不同的协议,如http协议或者集群部署时使用的ajp协议,web服务器应该能保证两个部署结构下切换时,web不需要变更,也就是要抽出一个接口专门处理请求,一个实现类对应一种请求,然后把它转成统一格式(考虑使用适配器模式,来适配不同接口/实现类为我们设置好的接口类型)</p>
 <p>这样模型就变成了</p>
-<p><img src="/2019/09/11/tomcat总体框架/tomcat%E6%80%BB%E4%BD%93%E6%A1%86%E6%9E%B6%5C1567961706513.png" alt="1567961706513"></p>
+<p><img src="/2019/09/11/tomcat总体框架/1567961706513.png" alt="1567961706513"></p>
 <p>其中Connecter负责处理不同协议,Container进行后续处理</p>
 <p>此时Connector的start()应具有 </p>
 <ol>
@@ -110,7 +147,7 @@
 <li>back() 返回响应</li>
 </ol>
 <h4 id="第三阶段"><a href="#第三阶段" class="headerlink" title="第三阶段:"></a>第三阶段:</h4><p>也就是说一个Container要对应多个Connector,而Connector是多方,要不要由Connector维护这个映射关系呢? 当然可以,但是tomcat使用一个专门的类Service来管理这个映射关系,于是结构变成了这样: 一个容器–Server包含多个Service,他们相互独立,一个Service维护多个Connector和一个Container</p>
-<p><img src="/2019/09/11/tomcat总体框架/tomcat%E6%80%BB%E4%BD%93%E6%A1%86%E6%9E%B6%5C1567962180196.png" alt="1567962180196"></p>
+<p><img src="/2019/09/11/tomcat总体框架/1567962180196.png" alt="1567962180196"></p>
 <h3 id="Container"><a href="#Container" class="headerlink" title="Container"></a>Container</h3><p>为了和tomcat对应,这里改成Engine表示整个Servlet引擎,用于处理请求</p>
 <p>当接收到请求后,我们需要Engine总能找到合适的Web应用来处理请求,也就是Engine可以聚合多个Context类,来表示多个不同的应用</p>
 <p>但是,如果我们想给不同的域名下的请求进行处理,可以将每一个域名视为一个虚拟的主机,因此,他们的关系为:</p>
@@ -119,7 +156,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">container中engine -- host -- context -- wrapper的结构就出现了</span><br></pre></td></tr></table></figure>
 
 <p>我们重新定义下Container: 这类组件功能为: 处理接收客户端的请求并返回响应数据. 尽管具体操作可能通过会委派到子组件完成,但是行为是一致的,因此,给Engine等添加一个父接口Container</p>
-<p><img src="/2019/09/11/tomcat总体框架/tomcat%E6%80%BB%E4%BD%93%E6%A1%86%E6%9E%B6%5C1567963905613.png" alt="1567963905613"></p>
+<p><img src="/2019/09/11/tomcat总体框架/1567963905613.png" alt="1567963905613"></p>
 <p>如图: tomcat中Container还能进行后台处理 </p>
 <p>如每30秒进行一次文件扫描,就是在BaseContainer.backgrountProcess()中异步执行的</p>
 <h3 id="Lifecycle"><a href="#Lifecycle" class="headerlink" title="Lifecycle"></a>Lifecycle</h3><p>检查一下目前结构能不能进行抽取和复用,可以发现所有组件都具有start()和stop()方法,也就是说可以提取一个结构管理生命周期(Lifecycle),他具有生命周期管理的方法</p>
@@ -136,7 +173,7 @@
 <p>tomcat使用的就是这个模式来实现客户端请求的处理的,也就是说Container的每个组件都是通过执行一个责任链完成具体的请求处理</p>
 <p>tomcat定义了管道(Pipeline)和阀(Value)两个接口. Pipeline用来构造责任链,Value就是责任链上的一个个节点,最后那个兜底的节点为StandardValve,是tomcat维护好的基础value,Pipeline提供的addValue()方法只会把新增节点放入StandardValve之前,然后通过首个value启动责任链</p>
 <p>目前结构变成了</p>
-<p><img src="/2019/09/11/tomcat总体框架/tomcat%E6%80%BB%E4%BD%93%E6%A1%86%E6%9E%B6%5C1567965271177.png" alt="1567965271177"></p>
+<p><img src="/2019/09/11/tomcat总体框架/1567965271177.png" alt="1567965271177"></p>
 <h3 id="Conncetor"><a href="#Conncetor" class="headerlink" title="Conncetor"></a>Conncetor</h3><p>要想和Container配合,Conncetor至少要具有以下功能:</p>
 <ul>
 <li>监听服务器端口,读取来自客户端的请求</li>
@@ -145,7 +182,7 @@
 <li>将相应返回客户端</li>
 </ul>
 <p>tomcat支持多协议 多IO方式,因此Connector要对协议和I/O<strong>建模</strong>,将他们抽取出来</p>
-<p><img src="/2019/09/11/tomcat总体框架/tomcat%E6%80%BB%E4%BD%93%E6%A1%86%E6%9E%B6%5C1567966318540.png" alt="1567966318540"></p>
+<p><img src="/2019/09/11/tomcat总体框架/1567966318540.png" alt="1567966318540"></p>
 <p>如上图,</p>
 <ul>
 <li>ProtocolHandler表示一个协议处理器,针对不同协和和I/O,提供了不同的实现(如Http11NioProtocol)</li>
@@ -154,16 +191,16 @@
 <li>在Conncetor启动的时候,Endpoint会启动socket监听指定端口,在侦听到请求后调用Processor进行数据的读取,由Processor映射到指定的Wrapper中</li>
 </ul>
 <p>Service虽然维护了Engine和Connector的关系,提供了addConnector的方法来管理,但是没有准备Container组件的注册和销毁</p>
-<p><img src="/2019/09/11/tomcat总体框架/tomcat%E6%80%BB%E4%BD%93%E6%A1%86%E6%9E%B6%5C1567967320381.png" alt="1567967320381"></p>
+<p><img src="/2019/09/11/tomcat总体框架/1567967320381.png" alt="1567967320381"></p>
 <p>实际上是通过Mapper来实现这个功能的.</p>
 <p><strong>tomcat通过适配器模式实现类Connetor和Mapper,Container的解耦.</strong></p>
 <p>tomcat默认的Connetor实现类Coyote对应的适配器为CoyoteAdapter,因此结构再次完善为:</p>
-<p><img src="/2019/09/11/tomcat总体框架/tomcat%E6%80%BB%E4%BD%93%E6%A1%86%E6%9E%B6%5C1567968262720.png" alt="1567968262720"></p>
+<p><img src="/2019/09/11/tomcat总体框架/1567968262720.png" alt="1567968262720"></p>
 <h2 id="至此-tomcat的整体框架就搭建的差不多了"><a href="#至此-tomcat的整体框架就搭建的差不多了" class="headerlink" title="至此: tomcat的整体框架就搭建的差不多了"></a>至此: tomcat的整体框架就搭建的差不多了</h2>
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/09/11/tomcat总体框架/" data-id="ck0fb2e5n0000bkiw92xfr3xe" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/09/11/tomcat总体框架/" data-id="ck0fcm8s200022ciwfa6wb477" class="article-share-link">Share</a>
       
       
     </footer>
@@ -212,7 +249,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://yoursite.com/2019/09/11/hello-world/" data-id="ck0fb2e5x0001bkiw2w3yddz8" class="article-share-link">Share</a>
+      <a data-url="http://yoursite.com/2019/09/11/hello-world/" data-id="ck0fcm8r700002ciwqa23wah8" class="article-share-link">Share</a>
       
       
     </footer>
@@ -251,6 +288,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2019/09/11/test/">test</a>
+          </li>
         
           <li>
             <a href="/2019/09/11/tomcat总体框架/">tomcat总体框架</a>
