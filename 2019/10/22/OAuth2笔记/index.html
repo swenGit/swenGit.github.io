@@ -57,15 +57,15 @@
 
   <meta name="description" content="一. 简单搭建1.客户端简单流程 获取code 客户端上送body 12345&amp;#123;    &quot;response_type&quot; : &quot;code&quot;,    &quot;client_id&quot; : &quot;103&quot;, # 注册在OAuth服务器的    &quot;redirect_uri&quot; : redirect_uris[0] # 用于重定向,客户端维护一堆uri,自取. 同样也要在OAuth服务器上注册&amp;#125;  后重">
 <meta property="og:type" content="article">
-<meta property="og:title" content="lalala~">
+<meta property="og:title" content="OAuth2读书笔记">
 <meta property="og:url" content="http://yoursite.com/2019/10/22/OAuth2笔记/index.html">
 <meta property="og:site_name" content="lalala~">
 <meta property="og:description" content="一. 简单搭建1.客户端简单流程 获取code 客户端上送body 12345&amp;#123;    &quot;response_type&quot; : &quot;code&quot;,    &quot;client_id&quot; : &quot;103&quot;, # 注册在OAuth服务器的    &quot;redirect_uri&quot; : redirect_uris[0] # 用于重定向,客户端维护一堆uri,自取. 同样也要在OAuth服务器上注册&amp;#125;  后重">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/2019/10/22/OAuth2笔记/referer.png">
-<meta property="og:updated_time" content="2019-10-21T22:06:45.398Z">
+<meta property="og:updated_time" content="2019-10-21T22:16:45.488Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="lalala~">
+<meta name="twitter:title" content="OAuth2读书笔记">
 <meta name="twitter:description" content="一. 简单搭建1.客户端简单流程 获取code 客户端上送body 12345&amp;#123;    &quot;response_type&quot; : &quot;code&quot;,    &quot;client_id&quot; : &quot;103&quot;, # 注册在OAuth服务器的    &quot;redirect_uri&quot; : redirect_uris[0] # 用于重定向,客户端维护一堆uri,自取. 同样也要在OAuth服务器上注册&amp;#125;  后重">
 <meta name="twitter:image" content="http://yoursite.com/2019/10/22/OAuth2笔记/referer.png">
   <link rel="canonical" href="http://yoursite.com/2019/10/22/OAuth2笔记/">
@@ -82,7 +82,7 @@
   };
 </script>
 
-  <title> | lalala~</title>
+  <title>OAuth2读书笔记 | lalala~</title>
   
 
 
@@ -218,7 +218,7 @@
       <meta itemprop="name" content="lalala~">
     </span>
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
+        <h1 class="post-title" itemprop="name headline">OAuth2读书笔记
 
           
         </h1>
@@ -234,7 +234,7 @@
                 
               
 
-              <time title="创建时间：2019-10-22 06:05:36 / 修改时间：06:06:45" itemprop="dateCreated datePublished" datetime="2019-10-22T06:05:36+08:00">2019-10-22</time>
+              <time title="创建时间：2019-10-22 06:16:13 / 修改时间：06:16:45" itemprop="dateCreated datePublished" datetime="2019-10-22T06:16:13+08:00">2019-10-22</time>
             </span>
           
             
@@ -270,6 +270,7 @@
 <blockquote>
 <h5 id="使用state进行跨站保护"><a href="#使用state进行跨站保护" class="headerlink" title="使用state进行跨站保护"></a>使用state进行跨站保护</h5><p>在获取code时多送一个state, state会随着302原样返回, 如果302返回的state和会话中的不一致,说明被CSRF攻击了</p>
 </blockquote>
+<a id="more"></a>
 </li>
 <li><p>获取token</p>
 <p>客户端上送body</p>
@@ -441,7 +442,7 @@
 <p>如果有人把它拼接在url上就会出现token暴露的情况,比如无意中复制粘贴网址/referer攻击都能得到url上的token</p>
 </li>
 </ol>
-<h4 id="2-受保护资源问题"><a href="#2-受保护资源问题" class="headerlink" title="2. 受保护资源问题"></a>2. 受保护资源问题</h4><p>​        主要是防止XSS注入, 前端解析参数的时候,如果参数传递一个 <script>alert('XSS')</script>,而不做转义,就会直接弹出一个提示框,类似的,如果参数传的功能更邪恶,自身也就更危险</p>
+<h4 id="2-受保护资源问题"><a href="#2-受保护资源问题" class="headerlink" title="2. 受保护资源问题"></a>2. 受保护资源问题</h4><p>​        主要是防止XSS注入, 前端解析参数的时候,如果参数传递一个 <code>&lt;script&gt;alert(&#39;XSS&#39;)&lt;/script&gt;</code>,而不做转义,就会直接弹出一个提示框,类似的,如果参数传的功能更邪恶,自身也就更危险</p>
 <p>解决方案都是前端的问题:</p>
 <pre><code>* 如设置响应头Content-Type为json,而不是text
 * 处理参数时进行encode

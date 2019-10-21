@@ -202,295 +202,6 @@
   
   
   <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/22/OAuth2笔记/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Swen">
-      <meta itemprop="description" content="rain drop dida dida ~~~">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="lalala~">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-            
-            <a href="/2019/10/22/OAuth2笔记/" class="post-title-link" itemprop="url">未命名</a>
-          
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              
-                
-              
-
-              <time title="创建时间：2019-10-22 06:05:36 / 修改时间：06:06:45" itemprop="dateCreated datePublished" datetime="2019-10-22T06:05:36+08:00">2019-10-22</time>
-            </span>
-          
-            
-
-            
-          
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h3 id="一-简单搭建"><a href="#一-简单搭建" class="headerlink" title="一. 简单搭建"></a>一. 简单搭建</h3><h4 id="1-客户端简单流程"><a href="#1-客户端简单流程" class="headerlink" title="1.客户端简单流程"></a>1.客户端简单流程</h4><ol>
-<li><p>获取code</p>
-<p>客户端上送body</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"response_type"</span> : <span class="string">"code"</span>,</span><br><span class="line">    "client_id" : "103", # 注册在OAuth服务器的</span><br><span class="line">    "redirect_uri" : redirect_uris[0] # 用于重定向,客户端维护一堆uri,自取. 同样也要在OAuth服务器上注册</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>后重定向回来, 地址后拼接?code=123456789</p>
-<blockquote>
-<h5 id="使用state进行跨站保护"><a href="#使用state进行跨站保护" class="headerlink" title="使用state进行跨站保护"></a>使用state进行跨站保护</h5><p>在获取code时多送一个state, state会随着302原样返回, 如果302返回的state和会话中的不一致,说明被CSRF攻击了</p>
-</blockquote>
-</li>
-<li><p>获取token</p>
-<p>客户端上送body</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"grant_type"</span> : <span class="string">"authorization_code"</span>,</span><br><span class="line">    <span class="attr">"code"</span> : code,</span><br><span class="line">    "redirect_uri" : redirect_uris[0] # 防止攻击者使用被篡改的地址获取受害者的code,因此被关联到攻击者的用户</span><br><span class="line">    "secret" : "服务器发放的秘钥, 非必送"</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>设置header</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">"Content-Type"</span> : <span class="string">"application/x-www-form-urlencoded"</span>, </span><br><span class="line">    # 使用Http基本认证对客户端进行身份认证, 用户名为clientId,密码为secret, secret在OAuth服务器注册</span><br><span class="line">    "Authorization" : "Basic" + encodeXXX(client_id, client_secret)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>先写简单流程,至于为什么要进行认证/如何进行认证后续再说</p>
-</blockquote>
-<p>响应为</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"access_token"</span> : <span class="string">"987987"</span>,</span><br><span class="line">    <span class="attr">"token_type"</span> : <span class="string">"Bearer"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>使用token访问资源</p>
-<p>有3个方案传递token,推荐使用第一种:</p>
-<ul>
-<li>使用HTTP Authorization Header</li>
-<li>使用表单格式的请求体</li>
-<li>使用URL编码的查询参数</li>
-</ul>
-<figure class="highlight js"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> headers = &#123;</span><br><span class="line">    <span class="string">"Authorization"</span> : <span class="string">"Bearer"</span> + access_token</span><br><span class="line">&#125;;</span><br><span class="line"><span class="keyword">var</span> resource = request(<span class="string">"POST"</span>, protectedResource,</span><br><span class="line">                       &#123;<span class="string">"headers"</span> : headers&#125;</span><br><span class="line">);</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>这个是什么方式? 设置请求头? 请求体装什么呢?头和体有什么区别?</p>
-</blockquote>
-</li>
-<li><p>刷新token</p>
-<p>在获取token的时候会一起返一个refresh_token, 如果用access_token请求资源失败时(OAuth服务器会先删掉库中的accessToken)–statusCode!=200~300,进行刷新,body为:</p>
-<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"grant_type"</span> : <span class="string">"refresh_token"</span>,</span><br><span class="line">    <span class="attr">"refresh_token"</span> : refresh_token</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-<p>headers和当初获取token时一样,响应也一样,包含两个token和一个expires_in 3600s</p>
-<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">	<span class="attr">"Content-Type"</span> : <span class="string">"application/x-www-form-urlencoded"</span>, </span><br><span class="line">    "Authorization" : "Basic" + encodeXXX(client_id, client_secret)</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
-
-
-
-</li>
-</ol>
-<h4 id="2-获取受保护的资源"><a href="#2-获取受保护的资源" class="headerlink" title="2.获取受保护的资源"></a>2.获取受保护的资源</h4><ol>
-<li><p>主要就是使用token换取用户信息,访问服务器数据库校验itoken是不是有效的,查询出用户信息后删除itoken(由是不是一次性的来决定)</p>
-<p>三种方法请求,推荐使用请求头,原因是:  <code>如果原本请求是json格式的话,表单格式不方便提交</code>,使用header就没有这个顾虑. 同样的,如果原本请求就是表单形式,那就可以使用form格式了</p>
-<p>如果token打算多次使用,那就意味着要多次访问资源服务器,这个时候可以使用 <strong>监听器/拦截器</strong>进行统一管理,如果送了Authorization/access_token就怎么处理,为空怎么处理 (看业务场景)</p>
-<p>如果token为空或失效,返回401</p>
-</li>
-<li><p>根据令牌的权限范围做出不同的响应,令牌的权限scope可以自定义后注册到OAuth服务器中</p>
-</li>
-</ol>
-<h4 id="3-OAuth服务器"><a href="#3-OAuth服务器" class="headerlink" title="3.OAuth服务器"></a>3.OAuth服务器</h4><ol>
-<li><p>校验clientId</p>
-<p>发起请求的时候服务器会查询数据库,<code>看看有没有clientId,如果有,redirectUri是不是已经注册了</code>,如果都满足条件,302到回调地址</p>
-</li>
-<li><p>对客户端进行授权</p>
-<p>客户端会弹出是否授权,点击同意后发送post请求,这里的请求体中添加字段reqid值为一个随机串,用于防止简单的csrf, 并设置成hiden</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">可不可以直接跳过用户授权,手动提交post请求</span><br><span class="line">post: &#123;</span><br><span class="line">	&quot;clientId&quot; : &quot;103&quot;,</span><br><span class="line">	&quot;reqid&quot; : &quot;随机名字&quot;</span><br><span class="line">&#125;</span><br><span class="line">不可以,原理和state相同</span><br></pre></td></tr></table></figure>
-
-<p>所以此时表单提交后的请求为:</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Referer: callback/authorized?response_type=code&amp;scope=foo&amp;client_id=103&amp;redirect_uri=callback&amp;state=第一次请求上送的</span><br><span class="line">Connection: keep-alive</span><br><span class="line"></span><br><span class="line">reqid=随机串&amp;approve=Approve // 这个approve只有点击允许授权才会送</span><br></pre></td></tr></table></figure>
-
-<p>这个时候服务器要</p>
-<ul>
-<li>校验response_type=code,目前是code,以后要是别的再说</li>
-<li>校验state, 防止csrf </li>
-</ul>
-<blockquote>
-<p>// FIXME</p>
-<p>关于state校验时机,要好好考量一下,以为中间进行了一次用户授权的页面跳转,state和reqid各用一次是不是就行了,如果这个时候还校验state会不会中途又被攻击了????</p>
-</blockquote>
-<ul>
-<li>生成一个code, 储存在数据库中,key可以是clientId</li>
-<li>重定向回去,带上code和state</li>
-</ul>
-</li>
-<li><p>颁发令牌,code换token</p>
-<p>使用post方式直接访问服务器,不需要使用http模板系统</p>
-<ol>
-<li><p>首先对客户端进行身份认证, secret就相当于是clientId的密码</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">提供一种方案:</span><br><span class="line">在header中的Authorization设置为:</span><br><span class="line">clientId:secret --Base64编码---&gt; post发送到服务端</span><br><span class="line">然后在body中检查有没有发送clientId和secret,如果两个地方都发送了,就返回错误信息</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>ps: P69,说有安全问题? 直接访问的后端,没经过浏览器也不行??</p>
-</blockquote>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">解析出参数后,校验clientId和secret</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>处理授权许可请求</p>
-<ol>
-<li><p>先检查grant_type,肯定是authorization_code</p>
-</li>
-<li><p>校验code, 在db中查询clientId和code是不是匹配,没有过期</p>
-<blockquote>
-<p><strong>注意:这里一旦code被使用过,不管什么原因,直接从db中delete</strong></p>
-</blockquote>
-</li>
-<li><p>生成token</p>
-<p>和code一样,这个token也是和clientId关联, 它还包含expires_in, refresh_token等属性</p>
-<blockquote>
-<p>为了安全考虑,可以储存token的密文,非对称加密,保证明文token的安全性</p>
-</blockquote>
-</li>
-</ol>
-</li>
-</ol>
-</li>
-</ol>
-<h4 id="4-其他授权方式"><a href="#4-其他授权方式" class="headerlink" title="4.其他授权方式"></a>4.其他授权方式</h4><ol>
-<li>隐式许可流程</li>
-<li>客户端凭据许可</li>
-<li>资源拥有者凭据许可</li>
-<li>断言许可</li>
-</ol>
-<p>各有各的用处,主流还是授权码许可, 安全灵活</p>
-<blockquote>
-<p>这个地方后续会拓展</p>
-</blockquote>
-<h3 id="二-OAuth2-0的实现和漏洞"><a href="#二-OAuth2-0的实现和漏洞" class="headerlink" title="二. OAuth2.0的实现和漏洞"></a>二. OAuth2.0的实现和漏洞</h3><h4 id="1-客户端问题"><a href="#1-客户端问题" class="headerlink" title="1. 客户端问题"></a>1. 客户端问题</h4><ol>
-<li><p>常规问题</p>
-<ul>
-<li>低级问题: 服务器发放的客户端秘钥泄露, 或者把token暴露给其他服务, 甚至把保密信息打印到日志中</li>
-<li><strong>将OAuth当成身份认证协议使用,而不施加额外防护措施</strong></li>
-</ul>
-</li>
-<li><p>CSRF</p>
-<ul>
-<li><p>如果用户登录某个网站,并且该网站允许用户的一系列任务,而攻击者诱导浏览器向这些uri发送请求,就可以以登录用户的身份执行该任务,举个例子:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">攻击者提前准备个号,在获取code后停止了OAuth步骤,然后把一个链接: &lt;/a herf=callback?code=刚刚准备好的code&gt;挂在小黄网上,诱导别人去点击, 如果那个用户之前访问过该域名,存有域下的cookie,就有可能被攻击者获取到受保护资源</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>常见解决方案就是通过state/reqid保证两次请求来自同一个会话</p>
-</blockquote>
-<p>state被攻击者猜中的概率必须小于等于2^-128,建议小于登录2^-160,可以使用UUID,16^32个选项</p>
-</li>
-</ul>
-</li>
-<li><p>客户端凭据失窃</p>
-<p>原生应用的隐式授权方式会暴露secret</p>
-<blockquote>
-<p>ps: secret暴露的话会怎样?攻击者可以自己拼接被害者的code获取token. (个人意见)</p>
-</blockquote>
-</li>
-<li><p>客户端重定向URI的注册后续</p>
-<p>为了让code不会被轻易拦截,需要对回调地址进行校验,因为随便换个回调地址就会报404,但是url上就会带上未使用的code, 校验URI的方式唯一可靠的方案是精准匹配,次优的是正则匹配/子目录匹配. 正则/子目录可以给多个回调地址授权,但是在个别情况下会出现安全问题</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">比如客户端本身暴露程度就很高,服务器又在校验redirectUrl的时候做的比较宽泛,就很容易导致code泄露</span><br></pre></td></tr></table></figure>
-
-<ul>
-<li><p>通过referer攻击code</p>
-<p> 首先要了解一下referer:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">referer是headers的一个属性, 值为 跳转前的地址</span><br><span class="line"></span><br><span class="line">在Genaral中有一个Referrer Policy的字段,用来设置referer生效的场景</span><br><span class="line">默认值为 &quot;no-referrer-when-downgrade&quot;, 意思就是当https页面后台加载地址为http协议的资源,或者跳转到http协议的页面时不会显示referer值</span><br></pre></td></tr></table></figure>
-
-<p><img src="/2019/10/22/OAuth2笔记/referer.png" alt></p>
-<p>攻击场景:</p>
-<p>​    钓鱼</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">注册时redirectUrl写的是https://mylocalhost:8080/</span><br><span class="line">实际回调地址为https://mylocalhost:8080/oauth/callback.html</span><br><span class="line">但是服务器的校验规则是子路径校验^https://mylocalhost:8080/.*$</span><br><span class="line">攻击者有正好能在该https://mylocalhost:8080/下创建页面https://mylocalhost:8080/danger.html</span><br><span class="line">然后诱导受害者访问https://正常获取code?clientId=..&amp;redirectUrl=danger的那个</span><br><span class="line">就能携带code回调到danger页面,https://mylocalhost:8080/danger.html?code=123</span><br></pre></td></tr></table></figure>
-
-<p>​    danger.html</p>
-<figure class="highlight html"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"https://attackeSite.com"</span> /&gt;</span></span><br></pre></td></tr></table></figure>
-
-<p>​    从referer中获取到新鲜的code</p>
-</li>
-<li><p>开放式重定向的token盗取</p>
-<p>这个是针对隐式授权,利用URI上<code>#</code>后边的参数保持不变来盗取token, 具体以后再说</p>
-</li>
-</ul>
-</li>
-<li><p>code失窃</p>
-<p>接着上边,第4点攻击者终于获取到了code,然后code只是中间步骤,还需要secret才能获取的token</p>
-<p>但是如果客户端是公开客户端,不设置秘钥,那他就已经凉了</p>
-</li>
-<li><p>token失窃</p>
-<p>在使用token的时候,我们的做法是放在headers中,</p>
-<p>如果有人把它拼接在url上就会出现token暴露的情况,比如无意中复制粘贴网址/referer攻击都能得到url上的token</p>
-</li>
-</ol>
-<h4 id="2-受保护资源问题"><a href="#2-受保护资源问题" class="headerlink" title="2. 受保护资源问题"></a>2. 受保护资源问题</h4><p>​        主要是防止XSS注入, 前端解析参数的时候,如果参数传递一个 <script>alert('XSS')</script>,而不做转义,就会直接弹出一个提示框,类似的,如果参数传的功能更邪恶,自身也就更危险</p>
-<p>解决方案都是前端的问题:</p>
-<pre><code>* 如设置响应头Content-Type为json,而不是text
-* 处理参数时进行encode
-* 添加响应头信息X-Content_Type..: nosniff   X-XSS..:1..</code></pre><h4 id="3-服务器问题"><a href="#3-服务器问题" class="headerlink" title="3. 服务器问题"></a>3. 服务器问题</h4><ol>
-<li><p>公共电脑的历史记录会泄露code, 要把code设置成一次性的,不怕重复使用</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">一个更加稳妥的方案是:</span><br><span class="line">在使用后的code后加上一个使用标记, 一旦这个code再次被使用, 追回之前用code换取的token, 减小威胁</span><br><span class="line">这样的话需要维护code和token的关系了</span><br><span class="line">client_id, code, expires_in, used_flag, token都有关系 (还有redirectUrl)</span><br></pre></td></tr></table></figure>
-</li>
-<li><p>OAuth不能确定使用者有没有进行redirectUrl的校验, 在换取token的时候强制要求上送redirectUrl</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">在换取token的时候会上送redirectUrl, 如果和授权客户端时的redirectUrl不一致, 说明获取code的时候的redirectUrl被攻击者修改过</span><br></pre></td></tr></table></figure>
-
-<blockquote>
-<p>如果校验了redirectUrl规则,还有没有必要在换取token的时候进行上送redirectUrl?</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">&gt; 两者都是为了保护code, 减少code泄露带来的风险.</span><br><span class="line">&gt; 方案1在获取code的时候要求匹配规则,减少被攻击者code被截取的概率,属于主动防护</span><br><span class="line">&gt; 方案2在换取token的时候校验redirectUrl,能在匹配规则失效的情况下再加一层防护,属于被动防护</span><br><span class="line">&gt; 由于换取token的请求不走浏览器,安全性更高一些,这里可以理解为是校验前后端是不是一致.</span><br><span class="line">&gt; 但是,如果secret泄露了,校验redirectUrl一致性就没有意义了,因为攻击者可以自己发起请求,只需要保证两次的redirectUrl一致即可, 在不校验url规则的情况下code泄露会变得非常简单 (个人观点)</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
-</blockquote>
-<blockquote>
-<blockquote>
-<p><strong>甚至,secret没有泄露,攻击者只需要携带危险的code再次302到正确的url,客户端会自己带上secret获取token,后续的受保护资源也就可以被危险code对应的账号访问了 (这个主要是靠state防护)</strong></p>
-</blockquote>
-<p>和state相比:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&gt; state是为了保证302前后的会话是不是一致的, 是由客户端完成的,力度大</span><br><span class="line">&gt; redirectUrl是为了确保客户端前后端是不是一致,是由服务器完成,力度小</span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
-</blockquote>
-</li>
-<li><p>确保token只能被已经授权的客户端使用</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">这个是担心token给另外的客户端获取到了受保护资源 (虽然不知道什么场景会出现,连token都被知道了,还想怎么保护?)</span><br><span class="line">方案是换取token的时候校验一下clientId是不是被授权的那个客户端</span><br></pre></td></tr></table></figure>
-
-</li>
-</ol>
-<h4 id="4-OAuth令牌的防护"><a href="#4-OAuth令牌的防护" class="headerlink" title="4. OAuth令牌的防护"></a>4. OAuth令牌的防护</h4><ol>
-<li>不要明文传递token,必须使用端到端的请求传递token, 使用TLS安全传输层来进行传输,避免token泄露</li>
-<li>数据库保存的密文的token,避免数据库被攻击后信息泄露, 加密方式不用太复杂SHA256即可</li>
-<li>设置较短的有效时间,减少单个token泄露带来的危害,长期使用的话通过客户端-服务器的refreshToken,这个refreshToken不会提供给资源服务器</li>
-<li>前端日志中,不能存放任何关于token/secret的信息,以免被抓取</li>
-<li>除了令牌刷新之外可以支持令牌撤回</li>
-</ol>
-<h3 id="三-其他"><a href="#三-其他" class="headerlink" title="三. 其他"></a>三. 其他</h3><p>还有一些需要补充: 比如scope, refreshToken, jwt, OpenID Connect, code之外的其他几种授权方式等</p>
-<p>参考资料: OAuth2实战</p>
-
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-          <div class="post-eof"></div>
-        
-      </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
-        <article itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block home">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/11/test/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -549,6 +260,95 @@
       
           <p><img src="/2019/09/11/test/1.jpg" alt="1"></p>
 
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/22/OAuth2笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Swen">
+      <meta itemprop="description" content="rain drop dida dida ~~~">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lalala~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+            
+            <a href="/2019/10/22/OAuth2笔记/" class="post-title-link" itemprop="url">OAuth2读书笔记</a>
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-22 06:16:13 / 修改时间：06:16:45" itemprop="dateCreated datePublished" datetime="2019-10-22T06:16:13+08:00">2019-10-22</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="一-简单搭建"><a href="#一-简单搭建" class="headerlink" title="一. 简单搭建"></a>一. 简单搭建</h3><h4 id="1-客户端简单流程"><a href="#1-客户端简单流程" class="headerlink" title="1.客户端简单流程"></a>1.客户端简单流程</h4><ol>
+<li><p>获取code</p>
+<p>客户端上送body</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"response_type"</span> : <span class="string">"code"</span>,</span><br><span class="line">    "client_id" : "103", # 注册在OAuth服务器的</span><br><span class="line">    "redirect_uri" : redirect_uris[0] # 用于重定向,客户端维护一堆uri,自取. 同样也要在OAuth服务器上注册</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>后重定向回来, 地址后拼接?code=123456789</p>
+<blockquote>
+<h5 id="使用state进行跨站保护"><a href="#使用state进行跨站保护" class="headerlink" title="使用state进行跨站保护"></a>使用state进行跨站保护</h5><p>在获取code时多送一个state, state会随着302原样返回, 如果302返回的state和会话中的不一致,说明被CSRF攻击了</p>
+</blockquote></li></ol>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2019/10/22/OAuth2笔记/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
         
       
     </div>
