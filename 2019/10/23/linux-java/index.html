@@ -55,18 +55,26 @@
   };
 </script>
 
-  <meta name="description" content="mybatis的常用API有增删改查,先记录下增和改的insert: 默认返回值为null,所以不要用int接收,会在强转的时候报空指针    如果在insert标签上加上selectKey标签,并且配置keyProperty属性,可以返回keyProperty字段的值    123&amp;lt;insert&amp;gt;&amp;lt;selectKey keyProperty=&quot;id&quot;&amp;gt;&amp;lt;![CDAT">
+  <meta name="description" content="起因: 读大量文件并解析,在windows的eclipse运行时间17s,在linux环境运行300s 彻查了一下原因,记录一下笔记 linux运行java程序首先记录一下命令">
 <meta property="og:type" content="article">
-<meta property="og:title" content="mybatis-update&#x2F;insert返回值">
-<meta property="og:url" content="http://yoursite.com/2019/10/12/mybatis-update-insert返回值/index.html">
+<meta property="og:title" content="linux-java">
+<meta property="og:url" content="http://yoursite.com/2019/10/23/linux-java/index.html">
 <meta property="og:site_name" content="lalala~">
-<meta property="og:description" content="mybatis的常用API有增删改查,先记录下增和改的insert: 默认返回值为null,所以不要用int接收,会在强转的时候报空指针    如果在insert标签上加上selectKey标签,并且配置keyProperty属性,可以返回keyProperty字段的值    123&amp;lt;insert&amp;gt;&amp;lt;selectKey keyProperty=&quot;id&quot;&amp;gt;&amp;lt;![CDAT">
+<meta property="og:description" content="起因: 读大量文件并解析,在windows的eclipse运行时间17s,在linux环境运行300s 彻查了一下原因,记录一下笔记 linux运行java程序首先记录一下命令">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2019-10-18T15:14:37.183Z">
+<meta property="og:image" content="http://yoursite.com/2019/10/23/linux-java/jps.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/23/linux-java/heap.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/23/linux-java/histo.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/23/linux-java/jstat.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/23/linux-java/top.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/23/linux-java/jstack.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/23/linux-java/pseww.png">
+<meta property="og:updated_time" content="2019-10-23T10:06:17.168Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="mybatis-update&#x2F;insert返回值">
-<meta name="twitter:description" content="mybatis的常用API有增删改查,先记录下增和改的insert: 默认返回值为null,所以不要用int接收,会在强转的时候报空指针    如果在insert标签上加上selectKey标签,并且配置keyProperty属性,可以返回keyProperty字段的值    123&amp;lt;insert&amp;gt;&amp;lt;selectKey keyProperty=&quot;id&quot;&amp;gt;&amp;lt;![CDAT">
-  <link rel="canonical" href="http://yoursite.com/2019/10/12/mybatis-update-insert返回值/">
+<meta name="twitter:title" content="linux-java">
+<meta name="twitter:description" content="起因: 读大量文件并解析,在windows的eclipse运行时间17s,在linux环境运行300s 彻查了一下原因,记录一下笔记 linux运行java程序首先记录一下命令">
+<meta name="twitter:image" content="http://yoursite.com/2019/10/23/linux-java/jps.png">
+  <link rel="canonical" href="http://yoursite.com/2019/10/23/linux-java/">
 
 
 <script id="page-configurations">
@@ -80,7 +88,7 @@
   };
 </script>
 
-  <title>mybatis-update/insert返回值 | lalala~</title>
+  <title>linux-java | lalala~</title>
   
 
 
@@ -204,7 +212,7 @@
   
   
   <div class="post-block post">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/12/mybatis-update-insert返回值/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/23/linux-java/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="Swen">
@@ -216,7 +224,7 @@
       <meta itemprop="name" content="lalala~">
     </span>
       <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">mybatis-update/insert返回值
+        <h1 class="post-title" itemprop="name headline">linux-java
 
           
         </h1>
@@ -232,19 +240,11 @@
                 
               
 
-              <time title="创建时间：2019-10-12 09:56:27" itemprop="dateCreated datePublished" datetime="2019-10-12T09:56:27+08:00">2019-10-12</time>
+              <time title="创建时间：2019-10-23 10:35:39 / 修改时间：18:06:17" itemprop="dateCreated datePublished" datetime="2019-10-23T10:35:39+08:00">2019-10-23</time>
             </span>
           
             
 
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-10-18 23:14:37" itemprop="dateModified" datetime="2019-10-18T23:14:37+08:00">2019-10-18</time>
-              </span>
             
           
 
@@ -267,9 +267,49 @@
     <div class="post-body" itemprop="articleBody">
 
       
-        <p>mybatis的常用API有增删改查,先记录下增和改的<br>insert: 默认返回值为null,所以不要用int接收,会在强转的时候报空指针<br>    如果在insert标签上加上selectKey标签,并且配置keyProperty属性,可以返回keyProperty字段的值<br>    <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">insert</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;<span class="name">selectKey</span> <span class="attr">keyProperty</span>=<span class="string">"id"</span>&gt;</span></span><br><span class="line">&lt;![CDATA[SELECT LAST_INSERT_ID() as id from ...]]&gt;</span><br></pre></td></tr></table></figure></p>
-<p>update: 默认返回select count(<em>) where condition();而不是影响行数<br>    比如update前后的记录完全一致,mysql会显示0,mybatis会显示count(</em>)<br>    如果在配置jdbc连接的时候,在jdbc.url正常连接后加上userAffectdRows=true,就会变成影响行数了<br>    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">jdbc.url=jdbc:mysql://localhost:3306/ssm?useAffectedRows=true</span><br></pre></td></tr></table></figure></p>
+        <p>起因:</p>
+<p>读大量文件并解析,在windows的eclipse运行时间17s,在linux环境运行300s</p>
+<p>彻查了一下原因,记录一下笔记</p>
+<h4 id="linux运行java程序"><a href="#linux运行java程序" class="headerlink" title="linux运行java程序"></a>linux运行java程序</h4><p>首先记录一下命令</p>
+<a id="more"></a>
 
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">首先java -version, 看看有没有安装jdk</span><br><span class="line"></span><br><span class="line">在linux下使用命令行编译java文件</span><br><span class="line">1: 只是独立的一个java文件</span><br><span class="line">编译生成test.class文件 ： javac test.java</span><br><span class="line">运行： java test</span><br><span class="line"></span><br><span class="line">2: 在这个特定包中的一个java文件</span><br><span class="line">编译生成*.class文件：javac packageName.* (此命令必须是在该文件包所在的路径，而不是文件所在的路径)</span><br><span class="line">运行： java packageName.* (同上)</span><br><span class="line"></span><br><span class="line">3： 运行时需要某个*.jar文件的支持，如连接DB需要相应的JDBC驱动</span><br><span class="line">编译生成*.class文件 ：不同情况与上1,2点相同</span><br><span class="line">运行时：java -cp .:lalala/mysql.jar packageName.* (其中mysql.jar就是DB的JDBC驱动)</span><br><span class="line">多个jar包之间用 : 分割</span><br><span class="line"></span><br><span class="line">4: 打jar包</span><br><span class="line">5: 运行jar包</span><br><span class="line">java -jar mysql.jar</span><br></pre></td></tr></table></figure>
+
+<h4 id="linux查看运行状态"><a href="#linux查看运行状态" class="headerlink" title="linux查看运行状态"></a>linux查看运行状态</h4><h5 id="jmap"><a href="#jmap" class="headerlink" title="* jmap"></a>* jmap</h5><p>​        查看当前系统中jvm进程 heap dump的情况，包括对象的数量，对象所占内存的大小</p>
+<ol>
+<li><p><code>jps     #查看进程id</code></p>
+<p><strong>jps -lm</strong></p>
+<p><img src="/2019/10/23/linux-java/jps.png" alt></p>
+</li>
+<li><p><code>jmap -dump:live,file=b.map 3210  #将22467进程存快照到b.map中</code></p>
+</li>
+<li><p><code>jmap -heap 3210  # 查看堆信息</code></p>
+<p><img src="/2019/10/23/linux-java/heap.png" alt></p>
+</li>
+<li><p><code>jmap -histo 3210  # 查看堆中对象信息</code></p>
+<p><img src="/2019/10/23/linux-java/histo.png" alt></p>
+</li>
+</ol>
+<h5 id="jstat"><a href="#jstat" class="headerlink" title="* jstat"></a>* jstat</h5><p><img src="/2019/10/23/linux-java/jstat.png" alt></p>
+<h5 id="jstack"><a href="#jstack" class="headerlink" title="* jstack"></a>* jstack</h5><pre><code>1. `top查看cpu使用情况`
+  2. `top -d 3210 -H 查看线程情况`</code></pre><p>​        <img src="/2019/10/23/linux-java/top.png" alt></p>
+<ol start="3">
+<li><p><code>jstack pid | grep 2752</code></p>
+<p><img src="/2019/10/23/linux-java/jstack.png" alt></p>
+</li>
+</ol>
+<h4 id="linux查看jvm参数"><a href="#linux查看jvm参数" class="headerlink" title="linux查看jvm参数"></a>linux查看jvm参数</h4><ol>
+<li><p><code>jps -lm</code></p>
+</li>
+<li><p><code>ps eww PID   就能看见了 -XX JAVA_HOME等</code></p>
+<p>记不住的话 ps -ef | grep PID也可以,就是东西少了点</p>
+<p><img src="/2019/10/23/linux-java/pseww.png" alt></p>
+</li>
+<li><p><code>或者jmap -heap/-histo PID, 直接看heap或者histo</code></p>
+</li>
+</ol>
+<h4 id="top命令详解"><a href="#top命令详解" class="headerlink" title="top命令详解"></a>top命令详解</h4><p><a href="http://www.linuxeye.com/command/top.html" target="_blank" rel="noopener">http://www.linuxeye.com/command/top.html</a></p>
+<h4 id="开始调试"><a href="#开始调试" class="headerlink" title="开始调试:"></a>开始调试:</h4>
     </div>
 
     
@@ -285,8 +325,8 @@
           <div class="post-nav">
             <div class="post-nav-next post-nav-item">
               
-                <a href="/2019/09/27/端口号被占用/" rel="next" title="端口号被占用">
-                  <i class="fa fa-chevron-left"></i> 端口号被占用
+                <a href="/2019/10/22/OAuth2笔记/" rel="next" title="OAuth2读书笔记">
+                  <i class="fa fa-chevron-left"></i> OAuth2读书笔记
                 </a>
               
             </div>
@@ -294,10 +334,6 @@
             <span class="post-nav-divider"></span>
 
             <div class="post-nav-prev post-nav-item">
-              
-                <a href="/2019/10/14/HashMap构造参数/" rel="prev" title="HashMap构造">
-                  HashMap构造 <i class="fa fa-chevron-right"></i>
-                </a>
               
             </div>
           </div>
@@ -346,6 +382,8 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-4"><a class="nav-link" href="#linux运行java程序"><span class="nav-number">1.</span> <span class="nav-text">linux运行java程序</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#linux查看运行状态"><span class="nav-number">2.</span> <span class="nav-text">linux查看运行状态</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#jmap"><span class="nav-number">2.1.</span> <span class="nav-text">* jmap</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#jstat"><span class="nav-number">2.2.</span> <span class="nav-text">* jstat</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#jstack"><span class="nav-number">2.3.</span> <span class="nav-text">* jstack</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#linux查看jvm参数"><span class="nav-number">3.</span> <span class="nav-text">linux查看jvm参数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#top命令详解"><span class="nav-number">4.</span> <span class="nav-text">top命令详解</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#开始调试"><span class="nav-number">5.</span> <span class="nav-text">开始调试:</span></a></li></ol></div>
+        
       </div>
       <!--/noindex-->
 
