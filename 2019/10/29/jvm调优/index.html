@@ -62,14 +62,23 @@
 <meta property="og:site_name" content="lalala~">
 <meta property="og:description" content="先挂连接,表示尊重 https://www.cnblogs.com/andy-zhou/p/5327288.html">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="https://images.cnblogs.com/cnblogs_com/andy-zhou/806435/o_Jvm_Tuning002.png">
-<meta property="og:image" content="https://images.cnblogs.com/cnblogs_com/andy-zhou/806435/o_Jvm_Tuning003.png">
-<meta property="og:image" content="https://images.cnblogs.com/cnblogs_com/andy-zhou/806435/o_Jvm_Tuning004.png">
-<meta property="og:updated_time" content="2019-10-29T15:01:26.045Z">
+<meta property="og:image" content="http://yoursite.com/2019/10/29/jvm调优/o_Jvm_Tuning002.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning003.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning004.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning005.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning006.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning007.png">
+<meta property="og:image" content="https://images.cnblogs.com/cnblogs_com/andy-zhou/806435/o_Jvm_Tuning008.png">
+<meta property="og:image" content="https://images.cnblogs.com/cnblogs_com/andy-zhou/806435/o_Jvm_Tuning009.png">
+<meta property="og:image" content="https://images.cnblogs.com/cnblogs_com/andy-zhou/806435/o_Jvm_Tuning010.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning011-1572449308192.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning012.png">
+<meta property="og:image" content="http://yoursite.com/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning013.png">
+<meta property="og:updated_time" content="2019-10-30T15:29:53.283Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="jvm调优">
 <meta name="twitter:description" content="先挂连接,表示尊重 https://www.cnblogs.com/andy-zhou/p/5327288.html">
-<meta name="twitter:image" content="https://images.cnblogs.com/cnblogs_com/andy-zhou/806435/o_Jvm_Tuning002.png">
+<meta name="twitter:image" content="http://yoursite.com/2019/10/29/jvm调优/o_Jvm_Tuning002.png">
   <link rel="canonical" href="http://yoursite.com/2019/10/29/jvm调优/">
 
 
@@ -236,11 +245,19 @@
                 
               
 
-              <time title="创建时间：2019-10-29 22:03:13 / 修改时间：23:01:26" itemprop="dateCreated datePublished" datetime="2019-10-29T22:03:13+08:00">2019-10-29</time>
+              <time title="创建时间：2019-10-29 22:03:13" itemprop="dateCreated datePublished" datetime="2019-10-29T22:03:13+08:00">2019-10-29</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-10-30 23:29:53" itemprop="dateModified" datetime="2019-10-30T23:29:53+08:00">2019-10-30</time>
+              </span>
             
           
 
@@ -307,16 +324,16 @@
 <ul>
 <li>标记-清除（Mark-Sweep）:</li>
 </ul>
-<p><img src="https://images.cnblogs.com/cnblogs_com/andy-zhou/806435/o_Jvm_Tuning002.png" alt="JVM Tuning 002"></p>
+<p><img src="/2019/10/29/jvm调优/o_Jvm_Tuning002.png" alt="JVM Tuning 002"></p>
 <p>此算法执行分两阶段。第一阶段从引用根节点开始标记所有被引用的对象，第二阶段遍历整个堆，把未标记的对象清除。此算法需要暂停整个应用，同时，会产生内存碎片。</p>
 <ul>
 <li>复制（Copying）:</li>
 </ul>
-<p><img src="https://images.cnblogs.com/cnblogs_com/andy-zhou/806435/o_Jvm_Tuning003.png" alt="JVM Tuning 003"></p>
+<p><img src="/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning003.png" alt="JVM Tuning 003"></p>
 <p>此算法把内存空间划为两个相等的区域，每次只使用其中一个区域。垃圾回收时，遍历当前使用区域，把正在使用中的对象复制到另外一个区域中。次算法每次只处理正在使用中的对象，因此复制成本比较小，同时复制过去以后还能进行相应的内存整理，不会出现“碎片”问题。当然，此算法的缺点也是很明显的，就是需要两倍内存空间。</p>
 <ul>
 <li><p>标记-整理（Mark-Compact）:</p>
-<p><img src="https://images.cnblogs.com/cnblogs_com/andy-zhou/806435/o_Jvm_Tuning004.png" alt="JVM Tuning 004"></p>
+<p><img src="/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning004.png" alt="JVM Tuning 004"></p>
 <p>此算法结合了“标记-清除”和“复制”两个算法的优点。也是分两阶段，第一阶段从根节点开始标记所有被引用对象，第二阶段遍历整个堆，把清除未标记对象并且把存活对象“压缩”到堆的其中一块，按顺序排放。此算法避免了“标记-清除”的碎片问题，同时也避免了“复制”算法的空间问题。</p>
 </li>
 </ul>
@@ -336,6 +353,61 @@
 </ul>
 <h5 id="5-如何区分垃圾"><a href="#5-如何区分垃圾" class="headerlink" title="5. 如何区分垃圾"></a>5. 如何区分垃圾</h5><p>上面说到的“引用计数”法，通过统计控制生成对象和删除对象时的引用数来判断。垃圾回收程序收集计数为0的对象即可。但是这种方法无法解决循环引用。所以，后来实现的垃圾判断算法中，都是从程序运行的根节点出发，遍历整个对象引用，查找存活的对象。那么在这种方式的实现中，垃圾回收从哪儿开始的呢？</p>
 <p>即:从哪儿开始查找哪些对象是正在被当前系统使用的。上面分析的堆和栈的区别，其中栈是真正进行程序执行地方，所以要获取哪些对象正在被使用，则需要从Java栈开始。同时，一个栈是与一个线程对应的，因此，如果有多个线程的话，则必须对这些线程对应的所有的栈进行检查。</p>
+<p>上面说到的“引用计数”法，通过统计控制生成对象和删除对象时的引用数来判断。垃圾回收程序收集计数为0的对象即可。但是这种方法无法解决循环引用。所以，后来实现的垃圾判断算法中，都是从程序运行的根节点出发，遍历整个对象引用，查找存活的对象。那么在这种方式的实现中，垃圾回收从哪儿开始的呢？即，从哪儿开始查找哪些对象是正在被当前系统使用的。上面分析的堆和栈的区别，其中栈是真正进行程序执行地方，所以要获取哪些对象正在被使用，则需要从Java栈开始。同时，一个栈是与一个线程对应的，因此，如果有多个线程的话，则必须对这些线程对应的所有的栈进行检查。</p>
+<p><img src="/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning005.png" alt="JVM Tuning 005"></p>
+<p>同时，除了栈外，还有系统运行时的寄存器等，也是存储程序运行数据的。这样，以栈或寄存器中的引用为起点，我们可以找到堆中的对象，又从这些对象找到对堆中其他对象的引用，这种引用逐步扩展，最终以null引用或者基本类型结束，这样就形成了一颗以Java栈中引用所对应的对象为根节点的一颗对象树，如果栈中有多个引用，则最终会形成多颗对象树。在这些对象树上的对象，都是当前系统运行所需要的对象，不能被垃圾回收。而其他剩余对象，则可以视为无法被引用到的对象，可以被当做垃圾进行回收。</p>
+<p>因此，垃圾回收的起点是一些根对象（java栈, 静态变量, 寄存器…）。而最简单的Java栈就是Java程序执行的main函数。这种回收方式，也是上面提到的“标记-清除”的回收方式.</p>
+<h5 id="6-如何处理碎片"><a href="#6-如何处理碎片" class="headerlink" title="6. 如何处理碎片"></a>6. 如何处理碎片</h5><p>由于不同Java对象存活时间是不一定的，因此，在程序运行一段时间以后，如果不进行内存整理，就会出现零散的内存碎片。碎片最直接的问题就是会导致无法分配大块的内存空间，以及程序运行效率降低。所以，在上面提到的基本垃圾回收算法中，“复制”方式和“标记-整理”方式，都可以解决碎片的问题</p>
+<h5 id="7-如何解决同时存在的对象创建和对象回收问题"><a href="#7-如何解决同时存在的对象创建和对象回收问题" class="headerlink" title="7. 如何解决同时存在的对象创建和对象回收问题"></a>7. 如何解决同时存在的对象创建和对象回收问题</h5><p>垃圾回收线程是回收内存的，而程序运行线程则是消耗（或分配）内存的，一个回收内存，一个分配内存，从这点看，两者是矛盾的。因此，在现有的垃圾回收方式中，要进行垃圾回收前，一般都需要暂停整个应用（即：暂停内存的分配），然后进行垃圾回收，回收完成后再继续应用。这种实现方式是最直接，而且最有效的解决二者矛盾的方式。</p>
+<p>但是这种方式有一个很明显的弊端，就是当堆空间持续增大时，垃圾回收的时间也将会相应的持续增大，对应应用暂停的时间也会相应的增大。一些对相应时间要求很高的应用，比如最大暂停时间要求是几百毫秒，那么当堆空间大于几个G时，就很有可能超过这个限制，在这种情况下，垃圾回收将会成为系统运行的一个瓶颈。为解决这种矛盾，有了并发垃圾回收算法，使用这种算法，垃圾回收线程与程序运行线程同时运行。在这种方式下，解决了暂停的问题，但是因为需要在新生成对象的同时又要回收对象，算法复杂性会大大增加，系统的处理能力也会相应降低，同时，“碎片”问题将会比较难解决。</p>
+<h5 id="8-为什么要分代"><a href="#8-为什么要分代" class="headerlink" title="8. 为什么要分代"></a>8. 为什么要分代</h5><p>分代的垃圾回收策略，是基于这样一个事实：不同的对象的生命周期是不一样的。因此，不同生命周期的对象可以采取不同的收集方式，以便提高回收效率。</p>
+<p>在Java程序运行的过程中，会产生大量的对象，其中有些对象是与业务信息相关，比如Http请求中的Session对象、线程、Socket连接，这类对象跟业务直接挂钩，因此生命周期比较长。但是还有一些对象，主要是程序运行过程中生成的临时变量，这些对象生命周期会比较短，比如：String对象，由于其不变类的特性，系统会产生大量的这些对象，有些对象甚至只用一次即可回收。</p>
+<p>试想，在不进行对象存活时间区分的情况下，每次垃圾回收都是对整个堆空间进行回收，花费时间相对会长，同时，因为每次回收都需要遍历所有存活对象，但实际上，对于生命周期长的对象而言，这种遍历是没有效果的，因为可能进行了很多次遍历，但是他们依旧存在。因此，分代垃圾回收采用分治的思想，进行代的划分，把不同生命周期的对象放在不同代上，不同代上采用最适合它的垃圾回收方式进行回收。</p>
+<h5 id="9-如何分代"><a href="#9-如何分代" class="headerlink" title="9. 如何分代"></a>9. 如何分代</h5><p><img src="/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning006.png" alt="JVM Tuning 006"></p>
+<p>如图所示：</p>
+<p>虚拟机中的共划分为三个代：年轻代（Young Generation）、年老点（Old Generation）和持久代（Permanent Generation）。其中持久代主要存放的是Java类的类信息，与垃圾收集要收集的Java对象关系不大。年轻代和年老代的划分是对垃圾收集影响比较大的。</p>
+<ul>
+<li><strong>年轻代:</strong></li>
+</ul>
+<p>所有新生成的对象首先都是放在年轻代的。年轻代的目标就是尽可能快速的收集掉那些生命周期短的对象。年轻代分三个区。一个Eden区，两个Survivor区(一般而言)。大部分对象在Eden区中生成。当Eden区满时，还存活的对象将被复制到Survivor区（两个中的一个），当这个Survivor区满时，此区的存活对象将被复制到另外一个Survivor区，当这个Survivor去也满了的时候，从第一个Survivor区复制过来的并且此时还存活的对象，将被复制“年老区(Tenured)”。需要注意，Survivor的两个区是对称的，没先后关系，所以同一个区中可能同时存在从Eden复制过来 对象，和从前一个Survivor复制过来的对象，而复制到年老区的只有从第一个Survivor去过来的对象。而且，Survivor区总有一个是空的。同时，根据程序需要，Survivor区是可以配置为多个的（多于两个），这样可以增加对象在年轻代中的存在时间，减少被放到年老代的可能。</p>
+<ul>
+<li><strong>年老代:</strong></li>
+</ul>
+<p>在年轻代中经历了N次垃圾回收后仍然存活的对象，就会被放到年老代中。因此，可以认为年老代中存放的都是一些生命周期较长的对象。</p>
+<ul>
+<li><strong>持久代:</strong></li>
+</ul>
+<p>用于存放静态文件，如今Java类、方法等。持久代对垃圾回收没有显著影响，但是有些应用可能动态生成或者调用一些class，例如Hibernate等，在这种时候需要设置一个比较大的持久代空间来存放这些运行过程中新增的类。持久代大小通过<code>-XX:MaxPermSize=</code>进行设置。</p>
+<h5 id="10-什么情况下触发垃圾回收"><a href="#10-什么情况下触发垃圾回收" class="headerlink" title="10. 什么情况下触发垃圾回收"></a>10. 什么情况下触发垃圾回收</h5><p>由于对象进行了分代处理，因此垃圾回收区域、时间也不一样。GC有两种类型：Scavenge GC和Full GC。</p>
+<p>Scavenge GC</p>
+<p>一般情况下，当新对象生成，并且在Eden申请空间失败时，就会触发Scavenge GC，对Eden区域进行GC，清除非存活对象，并且把尚且存活的对象移动到Survivor区。然后整理Survivor的两个区。这种方式的GC是对年轻代的Eden区进行，不会影响到年老代。因为大部分对象都是从Eden区开始的，同时Eden区不会分配的很大，所以Eden区的GC会频繁进行。因而，一般在这里需要使用速度快、效率高的算法，使Eden去能尽快空闲出来。</p>
+<p>Full GC</p>
+<p>对整个堆进行整理，包括Young、Tenured和Perm。Full GC因为需要对整个对进行回收，所以比Scavenge GC要慢，因此应该尽可能减少Full GC的次数。在对JVM调优的过程中，很大一部分工作就是对于FullGC的调节。有如下原因可能导致Full GC：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">· 年老代（Tenured）被写满</span><br><span class="line">· 持久代（Perm）被写满 </span><br><span class="line">· System.gc()被显示调用 </span><br><span class="line">·上一次GC之后Heap的各域分配策略动态变化</span><br></pre></td></tr></table></figure>
+
+<h5 id="11-分代垃圾回收流程示意"><a href="#11-分代垃圾回收流程示意" class="headerlink" title="11. 分代垃圾回收流程示意"></a>11. 分代垃圾回收流程示意</h5><p><img src="/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning007.png" alt="JVM Tuning 007"></p>
+<p><img src="https://images.cnblogs.com/cnblogs_com/andy-zhou/806435/o_Jvm_Tuning008.png" alt="JVM Tuning 008"></p>
+<p><img src="https://images.cnblogs.com/cnblogs_com/andy-zhou/806435/o_Jvm_Tuning009.png" alt="JVM Tuning 009"></p>
+<p><img src="https://images.cnblogs.com/cnblogs_com/andy-zhou/806435/o_Jvm_Tuning010.png" alt="JVM Tuning 010"></p>
+<h5 id="12-选择合适的垃圾收集算法"><a href="#12-选择合适的垃圾收集算法" class="headerlink" title="12. 选择合适的垃圾收集算法"></a>12. 选择合适的垃圾收集算法</h5><p><img src="/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning011-1572449308192.png" alt="JVM Tuning 011"></p>
+<p>用单线程处理所有垃圾回收工作，因为无需多线程交互，所以效率比较高。但是，也无法使用多处理器的优势，所以此收集器适合单处理器机器。当然，此收集器也可以用在小数据量（100M左右）情况下的多处理器机器上。可以使用-XX:+UseSerialGC打开。</p>
+<p><img src="/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning012.png" alt="JVM Tuning 012"></p>
+<p>对年轻代进行并行垃圾回收，因此可以减少垃圾回收时间。一般在多线程多处理器机器上使用。使用-XX:+UseParallelGC.打开。并行收集器在J2SE5.0第六6更新上引入，在Java SE6.0中进行了增强–可以对年老代进行并行收集。如果年老代不使用并发收集的话，默认是使用单线程进行垃圾回收，因此会制约扩展能力。使用-XX:+UseParallelOldGC打开。</p>
+<p>使用-XX:ParallelGCThreads=设置并行垃圾回收的线程数。此值可以设置与机器处理器数量相等。</p>
+<p>此收集器可以进行如下配置：</p>
+<blockquote>
+<p>最大垃圾回收暂停:指定垃圾回收时的最长暂停时间，通过-XX:MaxGCPauseMillis=<n><n>指定。&gt;<n><n>为毫秒.如果指定了此值的话，堆大小和垃圾回收相关参数会进行调整以达到指定值。设定此值可能会减少应用的吞吐量。</n></n></n></n></p>
+<p>吞吐量:吞吐量为垃圾回收时间与非垃圾回收时间的比值，通过-XX:GCTimeRatio=<n><n>来设定，公&gt;式为1/（1+N）。例如，-XX:GCTimeRatio=19时，表示5%的时间用于垃圾回收。默认情况为99，即&gt;1%的时间用于垃圾回收。</n></n></p>
+</blockquote>
+<p>并发收集器</p>
+<p>可以保证大部分工作都并发进行（应用不停止），垃圾回收只暂停很少的时间，此收集器适合对响应时间要求比较高的中、大规模应用。使用-XX:+UseConcMarkSweepGC打开。</p>
+<p><img src="/2019/10/29/jvm调优/jvm%E8%B0%83%E4%BC%98%5Co_Jvm_Tuning013.png" alt="JVM Tuning 013"></p>
+<p>并发收集器主要减少年老代的暂停时间，他在应用不停止的情况下使用独立的垃圾回收线程，跟踪可达对象。在每个年老代垃圾回收周期中，在收集初期并发收集器 会对整个应用进行简短的暂停，在收集中还会再暂停一次。第二次暂停会比第一次稍长，在此过程中多个线程同时进行垃圾回收工作。</p>
+<p>并发收集器使用处理器换来短暂的停顿时间。在一个N个处理器的系统上，并发收集部分使用K/N个可用处理器进行回收，一般情况下1&lt;=K&lt;=N/4。</p>
+<p>在只有一个处理器的主机上使用并发收集器，设置为incremental mode模式也可获得较短的停顿时间。</p>
+<p>浮动垃圾：由于在应用运行的同时进行垃圾回收，所以有些垃圾可能在垃圾回收进行完成时产生，这样就造成了“Floating Garbage”，这些垃圾需要在下次垃圾回收周期时才能回收掉。所以，并发收集器一般需要20%的预留空间用于这些浮动垃圾。</p>
+<p>Concurrent Mode Failure：并发收集器在应用运行时进行收集，所以需要保证堆在垃圾回收的这段时间有足够的空间供程序使用，否则，垃圾回收还未完成，堆空间先满了。这种情况下将会发生“并发模式失败”，此时整个应用将会暂停，进行垃圾回收。</p>
+<p>启动并发收集器：因为并发收集在应用运行时进行收集，所以必须保证收集完成之前有足够的内存空间供程序使用，否则会出现“Concurrent Mode Failure”。通过设置<code>-XX:CMSInitiatingOccupancyFraction=</code>指定还有多少剩余堆时开始执行并发收集</p>
 
     </div>
 
@@ -409,7 +481,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-堆与栈"><span class="nav-number">1.</span> <span class="nav-text">1. 堆与栈</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#栈是运行时的单位，而堆是存储的单位。"><span class="nav-number">1.1.</span> <span class="nav-text">栈是运行时的单位，而堆是存储的单位。</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#为什么要把堆和栈区分出来呢？栈中不是也可以存储数据吗？"><span class="nav-number">1.2.</span> <span class="nav-text">为什么要把堆和栈区分出来呢？栈中不是也可以存储数据吗？</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#堆中存什么？栈中存什么？"><span class="nav-number">1.3.</span> <span class="nav-text">堆中存什么？栈中存什么？</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-Java对象的大小"><span class="nav-number">2.</span> <span class="nav-text">2. Java对象的大小</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-引用类型"><span class="nav-number">3.</span> <span class="nav-text">3. 引用类型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-垃圾回收算法分类"><span class="nav-number">4.</span> <span class="nav-text">4. 垃圾回收算法分类</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#按照基本回收策略分"><span class="nav-number">4.1.</span> <span class="nav-text">按照基本回收策略分</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#按分区对待的方式分"><span class="nav-number">4.2.</span> <span class="nav-text">按分区对待的方式分</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#按系统线程分"><span class="nav-number">4.3.</span> <span class="nav-text">按系统线程分</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-如何区分垃圾"><span class="nav-number">5.</span> <span class="nav-text">5. 如何区分垃圾</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-5"><a class="nav-link" href="#1-堆与栈"><span class="nav-number">1.</span> <span class="nav-text">1. 堆与栈</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#栈是运行时的单位，而堆是存储的单位。"><span class="nav-number">1.1.</span> <span class="nav-text">栈是运行时的单位，而堆是存储的单位。</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#为什么要把堆和栈区分出来呢？栈中不是也可以存储数据吗？"><span class="nav-number">1.2.</span> <span class="nav-text">为什么要把堆和栈区分出来呢？栈中不是也可以存储数据吗？</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#堆中存什么？栈中存什么？"><span class="nav-number">1.3.</span> <span class="nav-text">堆中存什么？栈中存什么？</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#2-Java对象的大小"><span class="nav-number">2.</span> <span class="nav-text">2. Java对象的大小</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#3-引用类型"><span class="nav-number">3.</span> <span class="nav-text">3. 引用类型</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#4-垃圾回收算法分类"><span class="nav-number">4.</span> <span class="nav-text">4. 垃圾回收算法分类</span></a><ol class="nav-child"><li class="nav-item nav-level-6"><a class="nav-link" href="#按照基本回收策略分"><span class="nav-number">4.1.</span> <span class="nav-text">按照基本回收策略分</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#按分区对待的方式分"><span class="nav-number">4.2.</span> <span class="nav-text">按分区对待的方式分</span></a></li><li class="nav-item nav-level-6"><a class="nav-link" href="#按系统线程分"><span class="nav-number">4.3.</span> <span class="nav-text">按系统线程分</span></a></li></ol></li><li class="nav-item nav-level-5"><a class="nav-link" href="#5-如何区分垃圾"><span class="nav-number">5.</span> <span class="nav-text">5. 如何区分垃圾</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#6-如何处理碎片"><span class="nav-number">6.</span> <span class="nav-text">6. 如何处理碎片</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#7-如何解决同时存在的对象创建和对象回收问题"><span class="nav-number">7.</span> <span class="nav-text">7. 如何解决同时存在的对象创建和对象回收问题</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#8-为什么要分代"><span class="nav-number">8.</span> <span class="nav-text">8. 为什么要分代</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#9-如何分代"><span class="nav-number">9.</span> <span class="nav-text">9. 如何分代</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#10-什么情况下触发垃圾回收"><span class="nav-number">10.</span> <span class="nav-text">10. 什么情况下触发垃圾回收</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#11-分代垃圾回收流程示意"><span class="nav-number">11.</span> <span class="nav-text">11. 分代垃圾回收流程示意</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#12-选择合适的垃圾收集算法"><span class="nav-number">12.</span> <span class="nav-text">12. 选择合适的垃圾收集算法</span></a></li></ol></div>
         
       </div>
       <!--/noindex-->
