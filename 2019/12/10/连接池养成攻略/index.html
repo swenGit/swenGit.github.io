@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="连接池养成攻略stage 1: 容器存取连接池首先是一个连接的容器,用的时候直接从里边拿,close()的时候归回进去, 也就是说只需要处理好dataSource.getConnenction()和connection.close()就行了 获取连接:">
+<meta property="og:type" content="article">
+<meta property="og:title" content="连接池养成攻略">
+<meta property="og:url" content="http://yoursite.com/2019/12/10/连接池养成攻略/index.html">
+<meta property="og:site_name" content="lalala~">
+<meta property="og:description" content="连接池养成攻略stage 1: 容器存取连接池首先是一个连接的容器,用的时候直接从里边拿,close()的时候归回进去, 也就是说只需要处理好dataSource.getConnenction()和connection.close()就行了 获取连接:">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2019/12/10/连接池养成攻略/1575665864614.png">
+<meta property="og:updated_time" content="2019-12-10T05:52:29.034Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="连接池养成攻略">
+<meta name="twitter:description" content="连接池养成攻略stage 1: 容器存取连接池首先是一个连接的容器,用的时候直接从里边拿,close()的时候归回进去, 也就是说只需要处理好dataSource.getConnenction()和connection.close()就行了 获取连接:">
+<meta name="twitter:image" content="http://yoursite.com/2019/12/10/连接池养成攻略/1575665864614.png">
+  <link rel="canonical" href="http://yoursite.com/2019/12/10/连接池养成攻略/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>连接池养成攻略 | lalala~</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?dd1e5524be2b83762eb6a060ff1d5b1a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lalala~</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/10/连接池养成攻略/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Swen">
+      <meta itemprop="description" content="rain drop dida dida ~~~">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lalala~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">连接池养成攻略
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-12-10 13:37:01 / 修改时间：13:52:29" itemprop="dateCreated datePublished" datetime="2019-12-10T13:37:01+08:00">2019-12-10</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="连接池养成攻略"><a href="#连接池养成攻略" class="headerlink" title="连接池养成攻略"></a>连接池养成攻略</h3><h4 id="stage-1-容器存取"><a href="#stage-1-容器存取" class="headerlink" title="stage 1: 容器存取"></a>stage 1: 容器存取</h4><p>连接池首先是一个连接的容器,用的时候直接从里边拿,close()的时候归回进去, 也就是说只需要处理好dataSource.getConnenction()和connection.close()就行了</p>
+<h5 id="获取连接"><a href="#获取连接" class="headerlink" title="获取连接:"></a>获取连接:</h5><a id="more"></a>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span> 简易连接池:管理连接,涉及最大连接数(没做限制呢),最小连接数和初始容量</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span> swen</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Date</span> 2019/12/2 8:36</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">MyDataSource</span> <span class="keyword">extends</span> <span class="title">AbstractDataSource</span></span>&#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> LinkedList&lt;Connection&gt; pool = <span class="keyword">new</span> LinkedList&lt;&gt;();</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> initialSize;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> minIdle;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> maxActive;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> (pool.size() &lt; initialSize) &#123;</span><br><span class="line">                Connection conn = JDBCUtils.getConnection();</span><br><span class="line">                pool.push(conn);</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> Connection <span class="title">getConnection</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 处理没有连接的情况</span></span><br><span class="line">        <span class="keyword">if</span> (pool.size() &lt;= minIdle) &#123;</span><br><span class="line">            init();</span><br><span class="line">        &#125;</span><br><span class="line">        Connection conn = pool.poll();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ConnectionWrapper(conn, pool);</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">	...构造/get/set方法</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>JDBCUtils就省略了,连接池肯定要实现javax.sql.DataSource的,但是这个接口要重写的方法太多了,于是用</p>
+<p>AbstractDataSource先处理一下,类似这样:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">AbstractDataSource</span> <span class="keyword">implements</span> <span class="title">DataSource</span> </span>&#123;</span><br><span class="line">  <span class="meta">@Override</span></span><br><span class="line">  <span class="function"><span class="keyword">public</span> Connection <span class="title">getConnection</span><span class="params">(String username, String password)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">      <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"方法未被重写"</span>);</span><br><span class="line">  &#125;</span><br><span class="line">  ...</span><br></pre></td></tr></table></figure>
+
+<h5 id="归还连接"><a href="#归还连接" class="headerlink" title="归还连接:"></a>归还连接:</h5><p>增强原本的conn.close()方法有很多种方案,比如代理,装饰者,继承都可以做到. 这里采用了装饰的方式</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span> 包装类,装饰者的特点就是有一个成员变量的类型是自己的父类</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span> swen</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Date</span> 2019/12/3 7:14</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConnectionWrapper</span> <span class="keyword">extends</span> <span class="title">ConnectionAdapter</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Connection connection;</span><br><span class="line">    <span class="keyword">private</span> LinkedList&lt;Connection&gt; pool;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ConnectionWrapper</span><span class="params">(Connection connection, LinkedList&lt;Connection&gt; pool)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.connection = connection;</span><br><span class="line">        <span class="keyword">this</span>.pool = pool;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">        pool.push(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">   ... 下边还有两个方法是给测试类用的,省略了</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>同理,ConnectionAdapter也是Connection的直接实现类,实现了一大堆方法.</p>
+<p>这个wrapper的使用方式就是在getConnection()的时候给原本的JDBC4Connection实例包装一下</p>
+<h5 id="测试类"><a href="#测试类" class="headerlink" title="测试类:"></a>测试类:</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/**</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Description</span> 测试回收连接</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Author</span> swen</span></span><br><span class="line"><span class="comment"> * <span class="doctag">@Date</span> 2019/12/3 6:12</span></span><br><span class="line"><span class="comment"> **/</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">TestDemo</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">        MyDataSource dataSource = <span class="keyword">new</span> MyDataSource();</span><br><span class="line">        Connection connection = dataSource.getConnection();</span><br><span class="line">        PreparedStatement preparedStatement = connection.prepareStatement(<span class="string">"select * from city limit ?"</span>);</span><br><span class="line">        preparedStatement.setInt(<span class="number">1</span>, <span class="number">2</span>);</span><br><span class="line">        ResultSet resultSet = preparedStatement.executeQuery();</span><br><span class="line">        <span class="keyword">while</span> (resultSet.next()) &#123;</span><br><span class="line">            ResultSetMetaData metaData = resultSet.getMetaData();</span><br><span class="line">            <span class="keyword">int</span> count = metaData.getColumnCount();</span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">1</span>; i &lt; count + <span class="number">1</span>; i++) &#123;</span><br><span class="line">                System.out.print(metaData.getColumnName(i) + <span class="string">"---"</span> + resultSet.getString(metaData.getColumnName(i)) + <span class="string">"  "</span>);</span><br><span class="line">            &#125;</span><br><span class="line">            System.out.println();</span><br><span class="line">        &#125;</span><br><span class="line">        connection.close();</span><br><span class="line">        System.out.println(connection.getClass());</span><br><span class="line">        System.out.println(MyDataSource.getPool().size());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>结果为</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">city_id---1  city_name---西安  country_id---2  </span><br><span class="line">city_id---2  city_name---NewYork  country_id---2  </span><br><span class="line">class swenCCC.swen1202.ConnectionWrapper</span><br><span class="line">3</span><br></pre></td></tr></table></figure>
+
+<p>无参构造的初始容量是3,最小连接数是0,也就是说在close()之后,pool中元素个数仍旧为3个,归还而不是销毁. 这样就达到阶段1的目标: 从容器中获取连接,使用完毕后归还的目的了</p>
+<h4 id="stage-2-最大连接"><a href="#stage-2-最大连接" class="headerlink" title="stage 2: 最大连接"></a>stage 2: 最大连接</h4><p>最大连接数和等待时间的控制, 如果连接数不够了,总不能一直创建吧</p>
+<ol>
+<li>使用成员activeCount表示正在使用的连接数,在获取连接前判断<code>if (activeCount &gt;= maxActive)</code>, 如果超过了就等待. 当获取连接成功时,activeCount++,当归还连接时activeCount–.</li>
+</ol>
+<blockquote>
+<p>​    一开始写成了<code>if (pool.size() + activeCount &gt;= maxActive)</code>,在最后一次生成连接后就会等待</p>
+</blockquote>
+<ol start="2">
+<li>但是,归还连接的动作是在ConnectionWrapper中进行的,该类中没有activeCount成员. 正常来讲应该让MyDataSource提供一个回收方法,然后把整个MyDataSource注入到wrapper中去调用, 这里增加一个Holder类,用来装Connnection相关的一堆杂七杂八的东西,没有逻辑,只提供get/set方法,然后把这个Holder注入到Wrapper中</li>
+</ol>
+<h5 id="Holder类"><a href="#Holder类" class="headerlink" title="Holder类:"></a>Holder类:</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 这里添加Holder类稍显多余,但谁叫Druid也是这么做的呢,先把类补齐 o(╥﹏╥)o</span></span><br><span class="line"><span class="keyword">public</span> <span class="keyword">final</span> <span class="class"><span class="keyword">class</span> <span class="title">ConnectionHolder</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Connection connection;</span><br><span class="line">    <span class="keyword">private</span> MyDataSource myDataSource;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">ConnectionHolder</span><span class="params">(Connection connection, MyDataSource myDataSource)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">this</span>.connection = connection;</span><br><span class="line">        <span class="keyword">this</span>.myDataSource = myDataSource;</span><br><span class="line">    &#125;</span><br><span class="line">    ...</span><br></pre></td></tr></table></figure>
+
+<h5 id="Wrapper的改动"><a href="#Wrapper的改动" class="headerlink" title="Wrapper的改动:"></a>Wrapper的改动:</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 把close()方法集成到MyDataSource中来处理</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">ConnectionWrapper</span> <span class="keyword">extends</span> <span class="title">ConnectionAdapter</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> Connection connection;</span><br><span class="line">    <span class="keyword">private</span> ConnectionHolder connectionHolder;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span><span class="params">()</span> <span class="keyword">throws</span> SQLException </span>&#123;</span><br><span class="line">        connectionHolder.getMyDataSource().recycle(<span class="keyword">this</span>);</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="归还连接-1"><a href="#归还连接-1" class="headerlink" title="归还连接:"></a>归还连接:</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">recycle</span> <span class="params">(ConnectionWrapper wrapper)</span> </span>&#123;</span><br><span class="line">    activeCount--;</span><br><span class="line">    ConnectionHolder holder = wrapper.getConnectionHolder();</span><br><span class="line">    pool.push(holder);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="获取连接-1"><a href="#获取连接-1" class="headerlink" title="获取连接:"></a>获取连接:</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Connection <span class="title">getConnection</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!isInit) &#123;</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (pool.size() &lt;= minIdle) &#123;</span><br><span class="line">        genConn(); <span class="comment">// 这里会校验 pool.size() + activeCount &gt;= maxActive</span></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (activeCount &gt;= maxActive) &#123;</span><br><span class="line">        System.out.println(<span class="string">"超过最大连接数, 等待10s后重新获取"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            Thread.sleep(<span class="number">10000</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> tryGetConnection();</span><br><span class="line">    &#125;</span><br><span class="line">    activeCount++;</span><br><span class="line">    ConnectionHolder holder = pool.poll();</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> ConnectionWrapper(holder.getConnection(), holder);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 自带双出口的递归, 只归一次, 简陋版不考虑多线程导致栈溢出的情况</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> Connection <span class="title">tryGetConnection</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (activeCount &gt;= maxActive) &#123;</span><br><span class="line">        System.out.println(<span class="string">"超过最大连接数, 获取连接失败"</span>);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">return</span> getConnection();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>测试类结果:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">测试获取8次连接,并归还一次    // maxActive = 8</span><br><span class="line">poolingCount:1</span><br><span class="line">activeCount:7</span><br><span class="line"></span><br><span class="line">测试获取9次连接,并归还一次</span><br><span class="line">超过最大连接数, 等待10s后重新获取</span><br><span class="line">Exception in thread &quot;main&quot; java.lang.NullPointerException</span><br><span class="line">超过最大连接数, 获取连接失败</span><br><span class="line">	at swenCCC.swen1202.TestDemo.main(TestDemo.java:22)</span><br></pre></td></tr></table></figure>
+
+<p>其他先不管,至少最大连接数限制和超过最大连接后等待重试的功能是有了. 而且增加了Holder类,结构上更加完善.</p>
+<h4 id="stage-3-并发"><a href="#stage-3-并发" class="headerlink" title="stage 3:  并发"></a>stage 3:  并发</h4><p>并发环境怎么办,pool, activeCount ,isInit字段,各种判断条件妥妥的很不安全</p>
+<ol>
+<li>使用数组代替pool的LinkedList结构. </li>
+</ol>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">linkedList安全性太差,使用数组结构配合lock. </span><br><span class="line">其实换成线程安全的容器(比如LinkedBlockingQueue)也不是不行,但是要注意,有的场景依旧需要使用lock来避免C&amp;A问题, 为了结构清晰,重点是为了和Druid的结构一致o(╥﹏╥)o,把linkedList改成数组结构</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>还有一点, 前两版的pool都是按照队列的方式处理ConnHolder的, 这样是为了保持连接的活性. 但是druid提供了清理idle连接的功能,也就是说要尽可能的使用热点连接. 所以后续把队列访问方式修改成了堆栈方式</li>
+</ol>
+<blockquote>
+<p>为了和druid统一,将pool变量更名成connections</p>
+</blockquote>
+<h5 id="目前的变量"><a href="#目前的变量" class="headerlink" title="目前的变量"></a>目前的变量</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> ConnectionHolder[] connections; <span class="comment">// 之前的pool</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> poolingCount; <span class="comment">// 表示之前的pool.size(),池中连接数</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> initialSize = <span class="number">0</span>; <span class="comment">// 初始化大小,默认为0,在无参构造改成3了</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> minIdle = <span class="number">0</span>;  </span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> maxActive = <span class="number">8</span>;  <span class="comment">// 这几个配置的默认值和druid相同</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">int</span> activeCount = <span class="number">0</span>; <span class="comment">// 表示活跃连接数</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> isInit = <span class="keyword">false</span>; <span class="comment">// 初始化标记</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> ReentrantLock lock = <span class="keyword">new</span> ReentrantLock(); <span class="comment">// 大锁</span></span><br><span class="line"><span class="comment">// 以上成员存在风险的有3个:connections poolingCount activeCount, 这三个都是经常变动的,其他都不变</span></span><br><span class="line"><span class="comment">// 虽然connections使用volatile修饰了,只是保证了有序性,依旧不满足要求</span></span><br></pre></td></tr></table></figure>
+
+<p>在3个方法进行了lock保护,模式是一样的, 标准的lock + try + finally {unlock}, 只要是涉及到connections,poolingCount,activeCount的都加上锁. 下面的方法是改完pool结构后的效果</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// getConnection()调用, 那里有锁</span></span><br><span class="line"><span class="function"><span class="keyword">private</span> ConnectionHolder <span class="title">takeLast</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    ConnectionHolder holder = connections[poolingCount - <span class="number">1</span>]; <span class="comment">// 注意索引,不是conns.length-1</span></span><br><span class="line">    connections[poolingCount - <span class="number">1</span>] = <span class="keyword">null</span>;</span><br><span class="line">    <span class="keyword">return</span> holder;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">init</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    lock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (poolingCount + activeCount &gt;= maxActive) &#123;</span><br><span class="line">            <span class="keyword">throw</span> <span class="keyword">new</span> RuntimeException(<span class="string">"初始化失败, 最大连接数太少"</span>);</span><br><span class="line">        &#125;</span><br><span class="line">        connections = <span class="keyword">new</span> ConnectionHolder[maxActive];</span><br><span class="line">        <span class="keyword">while</span> (poolingCount &lt; initialSize) &#123;</span><br><span class="line">            Connection conn = JDBCUtils.getConnection();</span><br><span class="line">            connections[poolingCount] = <span class="keyword">new</span> ConnectionHolder(conn, <span class="keyword">this</span>);</span><br><span class="line">            poolingCount++;</span><br><span class="line">        &#125;</span><br><span class="line">        isInit = <span class="keyword">true</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        LOG.error(<span class="string">""</span>, e);</span><br><span class="line">        <span class="keyword">throw</span> e;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">recycle</span> <span class="params">(ConnectionWrapper wrapper)</span> </span>&#123;</span><br><span class="line">    lock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        activeCount--;</span><br><span class="line">        poolingCount++;</span><br><span class="line">        ConnectionHolder holder = wrapper.getConnectionHolder();</span><br><span class="line">        connections[poolingCount] = holder;  <span class="comment">// 这里有问题,索引计算出现了问题,保留错误,后续已修改</span></span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        LOG.error(<span class="string">""</span>, e);</span><br><span class="line">        <span class="keyword">throw</span> e;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="stage-4-异步创建连接"><a href="#stage-4-异步创建连接" class="headerlink" title="stage 4: 异步创建连接"></a>stage 4: 异步创建连接</h4><p>创建连接太慢了, 我想异步创建</p>
+<p>需求很合理, 准备一个线程一直从事生产, 注意getConn的takeLast前要确保池中有货</p>
+<p>ps: 原计划是在init方法中开启生产线程,生产足够后就挂起并唤醒消费线程,消费线程就是getConn,出了点问题,当所有连接都被使用时,消费者进入死循环了.</p>
+<blockquote>
+<p>错误已更正,</p>
+<ol>
+<li>生产线程 的工作机制应该是需要时再创建,而不是线程开启后就直接拉满</li>
+<li>消费线程 的挂起条件判错,只有当池中没有连接可用,而且<strong>总连接不超</strong>的条件下才会挂起并唤醒生产线程</li>
+</ol>
+</blockquote>
+<p>改善后代码如下:</p>
+<h5 id="生产线程"><a href="#生产线程" class="headerlink" title="生产线程:"></a>生产线程:</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 生产连接的线程, 生产线程是在init()方法中开启的</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">CreateConnectionThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="comment">// 线程开启后先挂起自己,等候被唤醒</span></span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            empty.await(); <span class="comment">// 这里报错IllegalMonitorStateException,是因为		Thread.currentThread() != getExclusiveOwnerThread(); 当前线程不是独有锁标记的线程,解决很简单</span></span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            LOG.error(<span class="string">""</span>,e );</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">for</span> (;;) &#123;</span><br><span class="line">            lock.lock();</span><br><span class="line">            <span class="keyword">try</span> &#123;</span><br><span class="line">                <span class="comment">// 防止创建超过maxActive数量的连接</span></span><br><span class="line">                <span class="keyword">if</span> (activeCount + poolingCount &gt;= maxActive) &#123;</span><br><span class="line">                    notEmpty.signal();</span><br><span class="line">                    empty.await();</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                genConn();</span><br><span class="line">                notEmpty.signal();</span><br><span class="line">                empty.await();</span><br><span class="line">            &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                LOG.error(<span class="string">""</span>, e);</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">                lock.unlock();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line"></span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">genConn</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (poolingCount + activeCount &lt; maxActive) &#123;</span><br><span class="line">            Connection conn = JDBCUtils.getConnection();</span><br><span class="line">            connections[poolingCount] = <span class="keyword">new</span> ConnectionHolder(conn, MyDataSource.<span class="keyword">this</span>);</span><br><span class="line">            poolingCount++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="消费线程"><a href="#消费线程" class="headerlink" title="消费线程:"></a>消费线程:</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> Connection <span class="title">getConnection</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!isInit) &#123;</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    lock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="comment">// 池中连接过少,而且总连接不超,等待生产</span></span><br><span class="line">        <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">            <span class="keyword">if</span> ((poolingCount == <span class="number">0</span> &amp;&amp; poolingCount + activeCount &lt; maxActive) || poolingCount + activeCount &lt;= minIdle) &#123;</span><br><span class="line">                empty.signal();</span><br><span class="line">                notEmpty.await();</span><br><span class="line">            &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 连接过多,等待消费</span></span><br><span class="line">        <span class="keyword">if</span> (activeCount &gt;= maxActive) &#123;</span><br><span class="line">            LOG.error(<span class="string">"超过最大连接数, 等待10s后重新获取"</span>);</span><br><span class="line">            notEmpty.await(<span class="number">10</span>, TimeUnit.SECONDS);</span><br><span class="line">            <span class="keyword">return</span> tryGetConnection();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 初始逻辑</span></span><br><span class="line">        ConnectionHolder holder = takeLast();</span><br><span class="line">        activeCount++;</span><br><span class="line">        poolingCount--;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> ConnectionWrapper(holder.getConnection(), holder);</span><br><span class="line">    &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">        LOG.error(<span class="string">"获取连接失败"</span>, e);</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>经过测试,异步创建连接功能正常,线程间通讯OK. 但是,说实在的,生产连接的时候消费者是挂起状态,这个和在同一个线程里做这件事有啥区别么?目前能够让两者同时进行的场景就是总连接数少于minIdle的时候,生产线程可以后台生产的同时,消费线程也能正常的使用. </p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 唤醒生产线程的时机, 在getConnection()中</span></span><br><span class="line"><span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">    <span class="keyword">if</span> (poolingCount + activeCount &gt;= maxActive) &#123;</span><br><span class="line">        <span class="keyword">break</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (poolingCount == <span class="number">0</span>) &#123;</span><br><span class="line">        empty.signal();</span><br><span class="line">        notEmpty.await();</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (poolingCount + activeCount &lt;= minIdle) &#123;</span><br><span class="line">        empty.signal();</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">break</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="stage-5-销毁连接"><a href="#stage-5-销毁连接" class="headerlink" title="stage 5: 销毁连接"></a>stage 5: 销毁连接</h4><p>有生产就要有销毁, </p>
+<ol>
+<li>既然已经把池中结构改为堆栈式了,闲置时间超过maxEvictableIdleTimeMillis的连接就丢掉吧. 计算闲置时间,需要知道连接的归还时间,这个是连接级的(每个连接私有的),把它放在Holder中,扩充连接属性.</li>
+<li>长期老旧的连接也销毁掉,省的以后出现故障. 这个的优先级甚至更高,允许出现销毁完老旧连接后poolingCount不足minIdle的情况</li>
+<li>热点连接要保留,我管低于minEvictableIdleTimeMillis的连接叫做热点连接</li>
+</ol>
+<h5 id="增加的字段"><a href="#增加的字段" class="headerlink" title="增加的字段:"></a>增加的字段:</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">long</span> minEvictableIdleTimeMillis = <span class="number">1000L</span> * <span class="number">60L</span> * <span class="number">30L</span>; <span class="comment">// 用于区分热点连接, 默认为30min, 非热点连接可在回收线程回收</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">long</span> maxEvictableIdleTimeMillis = <span class="number">1000L</span> * <span class="number">60L</span> * <span class="number">60L</span> * <span class="number">7L</span>; <span class="comment">// 连接最大闲置时抛弃时间, 默认为7h, 闲置过长,即使是minIdle都救不了的那种</span></span><br><span class="line"><span class="keyword">private</span> <span class="keyword">long</span> phyTimeoutMillis = -<span class="number">1</span>; <span class="comment">// 连接最大寿命</span></span><br><span class="line"><span class="keyword">private</span> ConnectionHolder[] evictConnections; <span class="comment">// 临时保存将要抛弃的链接用的容器</span></span><br></pre></td></tr></table></figure>
+
+<h5 id="销毁线程"><a href="#销毁线程" class="headerlink" title="销毁线程:"></a>销毁线程:</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DestroyConnectionThread</span> <span class="keyword">extends</span> <span class="title">Thread</span> </span>&#123;</span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        lock.lock();</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">int</span> checkCount = poolingCount - minIdle;</span><br><span class="line">            <span class="keyword">final</span> <span class="keyword">long</span> currentTimeMillis = System.currentTimeMillis();</span><br><span class="line">            <span class="comment">// 从前往后开始数, 越是前边, idle时间越长</span></span><br><span class="line">            <span class="keyword">int</span> evictCount = <span class="number">0</span>;</span><br><span class="line">            <span class="comment">// 标记要抛弃的连接</span></span><br><span class="line">            <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; poolingCount; i++) &#123;</span><br><span class="line">                ConnectionHolder connection = connections[i];</span><br><span class="line">                <span class="comment">// 优先检查存活时间</span></span><br><span class="line">                <span class="keyword">if</span> (phyTimeoutMillis &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                    <span class="keyword">long</span> phyConnectTimeMillis = currentTimeMillis - connection.connectTimeMillis;</span><br><span class="line">                    <span class="keyword">if</span> (phyConnectTimeMillis &gt; phyTimeoutMillis) &#123;</span><br><span class="line">                        evictConnections[evictCount++] = connection;</span><br><span class="line">                        <span class="keyword">continue</span>;</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="comment">// 发现热点连接后不检查后续的phyTimeoutMillis存活时间了,以后再清</span></span><br><span class="line">                <span class="keyword">long</span> idleMillis = currentTimeMillis - connection.lastActiveTimeMillis;</span><br><span class="line">                <span class="keyword">if</span> (idleMillis &lt; minEvictableIdleTimeMillis) &#123;</span><br><span class="line">                    <span class="keyword">break</span>;</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">if</span> (i &lt; checkCount) &#123;</span><br><span class="line">                    evictConnections[evictCount++] = connection;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125; <span class="keyword">else</span> <span class="keyword">if</span> (idleMillis &gt; maxEvictableIdleTimeMillis) &#123;</span><br><span class="line">                    evictConnections[evictCount++] = connection;</span><br><span class="line">                    <span class="keyword">continue</span>;</span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 整理可用连接池</span></span><br><span class="line">            <span class="keyword">if</span> (evictCount &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                System.arraycopy(connections, evictCount, connections, <span class="number">0</span>, poolingCount - evictCount);</span><br><span class="line">                Arrays.fill(connections, poolingCount - evictCount, poolingCount, <span class="keyword">null</span>);</span><br><span class="line">                poolingCount -= evictCount;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">            LOG.error(<span class="string">""</span>,e );</span><br><span class="line">            <span class="keyword">throw</span> e;</span><br><span class="line">        &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">            lock.unlock();</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// 清理多余连接, 变量evictConnections为销毁线程专用,不涉及安全问题 -- 这里有问题,不能全部遍历,很好改,保留错误</span></span><br><span class="line">        <span class="keyword">for</span> (ConnectionHolder evictConnection : evictConnections) &#123;</span><br><span class="line">            JDBCUtils.closeConn(evictConnection.getConnection());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>线程的启动通过定时器:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 简易版定时器.....233</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">DestroyTimerThread</span> <span class="keyword">extends</span> <span class="title">Thread</span></span>&#123;</span><br><span class="line">        <span class="meta">@Override</span></span><br><span class="line">        <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">            <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">                <span class="keyword">try</span> &#123;</span><br><span class="line">                    Thread.sleep(<span class="number">1</span> * <span class="number">1000</span> * <span class="number">60</span>);</span><br><span class="line">                &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">                    e.printStackTrace();</span><br><span class="line">                &#125;</span><br><span class="line">                destroyConnectionThread.start();</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>其他有些小改动, 比如Holder中添加两个属性,并在适当的时机赋值</p>
+<p>解释一下销毁线程,</p>
+<ol>
+<li><p>首先为什么要把要丢弃的连接放在evictConnections中,而不是当时就close()掉:</p>
+<p>因为close()需要消耗一定资源,就和IO一样,比较耗时,不适合放在lock中浪费时间,加大锁冲突</p>
+</li>
+<li><p>不在当时就close(), 给每一个Holder加一个标记表示是不是被evict行不行?</p>
+<p>不行,比如每个Holder添加成员boolean isEvictable;如果为true就抽时间回收. 一开始我不知道connections中哪个conn是isEvictable的,就需要全部遍历,这样就要在lock中操作,还是会出现1情况的问题</p>
+</li>
+<li><p>标记可抛弃连接的逻辑是现找老年连接后continue,之后如果是热点连接break; 这两个逻辑的主次怎么区分?</p>
+<p>这个逻辑其实是参照着Druid的逻辑,看着很难受,后续给改了.这个逻辑看似是优先处理老年,不满足才会处理热点,但是由于热点时会直接break,成为直接出口,也就是说热点连接中的老年连接不会被处理. 但是如果全部热点都是老年连接,逻辑会走continue,没有机会走到break,直接出口也是有可能不生效的.</p>
+<p>概括起来就是,主要出口是找到一个不是年老的,而且还是热点的连接. </p>
+<p>实际上会有一个连接既是老年的,也是热点的情况, 导致这个逻辑比较混乱.</p>
+<p>这么设计的优势就是能够保证evictConnections中的连接在connections中是连续的,这样整理connections的时候逻辑特别简单,一个System.arraycopy整体迁移+一个Arrays.fill批量赋值就解决了,时间上最快.</p>
+<p>我还是看着别扭,谁叫这个连接池是MyDS,而不是DruidDS呢?于是我又改成自己的逻辑了.</p>
+<p>每次清理的时候一定会回收老年连接,遇到热点连接直接continue;</p>
+<p>这里遍历pool的时候一定会把每一个conn都走过来,为了节约时间,把lastActiveTimeMillis写成public,省去了get方法的耗时.</p>
+<p>这样唯一出口就是遍历结束,然后把<strong>非热点</strong>的连接限制到<strong>minIdle</strong>,甚至,在minIdle里的<strong>巨懒的连接</strong>也清掉. 个别时机还会清掉有点活跃,但是很<strong>老的连接</strong>.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; poolingCount; i++) &#123;</span><br><span class="line">    ConnectionHolder connection = connections[i];</span><br><span class="line">    <span class="comment">// 年老连接</span></span><br><span class="line">    <span class="keyword">if</span> (phyTimeoutMillis &gt; <span class="number">0</span>) &#123;</span><br><span class="line">        <span class="keyword">long</span> phyConnectTimeMillis = currentTimeMillis - connection.connectTimeMillis;</span><br><span class="line">        <span class="keyword">if</span> (phyConnectTimeMillis &gt; phyTimeoutMillis) &#123;</span><br><span class="line">            evictConnections[evictCount++] = connection;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 巨懒的连接</span></span><br><span class="line">    <span class="keyword">long</span> idleMillis = currentTimeMillis - connection.lastActiveTimeMillis;</span><br><span class="line">    <span class="keyword">if</span> (idleMillis &gt; maxEvictableIdleTimeMillis) &#123;</span><br><span class="line">        evictConnections[evictCount++] = connection;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="comment">// 非热点的连接, 保留到minIdle即可</span></span><br><span class="line">    <span class="keyword">if</span> (idleMillis &lt; minEvictableIdleTimeMillis) &#123;</span><br><span class="line">        <span class="keyword">if</span> (tag == DRUID) &#123;</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">if</span> (tag == SWEN) &#123;</span><br><span class="line">            <span class="keyword">continue</span>;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (i &lt; checkCount) &#123;</span><br><span class="line">        evictConnections[evictCount++] = connection;</span><br><span class="line">        <span class="keyword">continue</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样处理会导致evictConnections在connections中不连续,类似出现这种情况:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">conns: [idle, idle, hot, old, hot, null, null]</span><br><span class="line">evict: [idle, idle, old]</span><br></pre></td></tr></table></figure>
+
+<p>不能按照原本的整体迁移方案来整理conns, 这里编写了一个工具类,能够把数组A中 与B重复的元素移除,并整理, 其实特别简单,但是钻了牛角尖想了好久,大家可以试试,互相交流(*^▽^*)</p>
+<p>测试类</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    String[] A = &#123;<span class="string">"0"</span>, <span class="string">"1"</span>, <span class="string">"2"</span>, <span class="string">"3"</span>, <span class="string">"4"</span>, <span class="keyword">null</span>&#125;;</span><br><span class="line">    String[] B = &#123;<span class="string">"0"</span>, <span class="string">"1"</span>, <span class="string">"3"</span>&#125;;</span><br><span class="line">    dropBFromA(A, B);</span><br><span class="line">    System.out.println(Arrays.toString(A));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2019/12/10/连接池养成攻略/1575665864614.png" alt="1575665864614"></p>
+</li>
+</ol>
+<p>这样销毁线程就完成了.</p>
+<h4 id="stage-6-定时任务"><a href="#stage-6-定时任务" class="headerlink" title="stage 6: 定时任务"></a>stage 6: 定时任务</h4><p>之前的定时器会出现一个问题: 当次任务还没有执行完,定时又到了,会在开一个线程去执行新的任务,这个不是我想要的. 把简陋版定时器升级一下,变成简易版定时器</p>
+<blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&gt; ScheduledExecutorService API介绍:</span><br><span class="line">&gt; // 0延迟执行任务,2000ms后再次执行,如果前一个任务没有结束,则等待任务结束后再执行新任务 </span><br><span class="line">&gt; destroySchedulerFuture = destroyScheduler.scheduleAtFixedRate(task, 0, 2000, TimeUnit.MILLISECONDS);</span><br><span class="line">&gt; // 1000ms后首次执行任务,任务结束后再过2000ms执行下一个任务</span><br><span class="line">&gt; destroySchedulerFuture = destroyScheduler.scheduleWithFixedDelay(task2, 1000, 2000, TimeUnit.MILLISECONDS);</span><br><span class="line">&gt; // 延时执行任务, 2000ms后执行任务,支持Runnable和Callable, callable的返回值可以通过destroySchedulerFuture.get()获取,该方法会阻塞线程</span><br><span class="line">&gt; destroySchedulerFuture = destroyScheduler.schedule(new Call(), 2000, TimeUnit.MILLISECONDS);</span><br><span class="line">&gt; </span><br><span class="line">&gt;</span><br></pre></td></tr></table></figure>
+</blockquote>
+<p>默认每秒进行一次连接清理, 新增timeBetweenEvictionRunsMillis字段,表示两次销毁任务执行的间距</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">private</span> <span class="keyword">void</span> <span class="title">startDestroyTask</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">long</span> cd = timeBetweenEvictionRunsMillis &lt; <span class="number">1000</span> ? <span class="number">1000</span> : timeBetweenEvictionRunsMillis;</span><br><span class="line">    destroyScheduler = Executors.newScheduledThreadPool(<span class="number">1</span>);</span><br><span class="line">    destroyTask = <span class="keyword">new</span> DestroyTask();</span><br><span class="line">    destroySchedulerFuture = destroyScheduler.scheduleAtFixedRate(destroyTask, cd, cd, TimeUnit.MILLISECONDS);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="stage-7-关闭连接池"><a href="#stage-7-关闭连接池" class="headerlink" title="stage 7: 关闭连接池"></a>stage 7: 关闭连接池</h4><p>关闭连接池要做的就是阻塞其他功能,然后销毁掉池中连接. 至于外部的连接交给别人</p>
+<p>对于异步线程,采用interrupt的方式让他报错, 对于自身线程,是用标志位进行差异.</p>
+<h5 id="close方法销毁自身连接"><a href="#close方法销毁自身连接" class="headerlink" title="close方法销毁自身连接"></a>close方法销毁自身连接</h5><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">close</span> <span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (destroySchedulerFuture != <span class="keyword">null</span>) &#123;</span><br><span class="line">        destroySchedulerFuture.cancel(<span class="keyword">true</span>);</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">if</span> (createConnectionThread != <span class="keyword">null</span>) &#123;</span><br><span class="line">        createConnectionThread.interrupt();</span><br><span class="line">    &#125;</span><br><span class="line">    lock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">for</span> (<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; poolingCount; i++) &#123;</span><br><span class="line">            ConnectionHolder holder = connections[i];</span><br><span class="line">            JDBCUtils.closeConn(holder.getConnection());</span><br><span class="line">        &#125;</span><br><span class="line">        closed = <span class="keyword">true</span>;</span><br><span class="line">    &#125; <span class="keyword">catch</span> (Exception e) &#123;</span><br><span class="line">        LOG.error(<span class="string">"close fail ... "</span>,e );</span><br><span class="line">    &#125; <span class="keyword">finally</span> &#123;</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h5 id="关闭连接池的影响"><a href="#关闭连接池的影响" class="headerlink" title="关闭连接池的影响:"></a>关闭连接池的影响:</h5><p>销毁连接池后,外部连接也要销毁,外部的连接没有地方存,就等调用中结束后自己手动关吧,这个后期可以优化</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">recycle</span> <span class="params">(ConnectionWrapper wrapper)</span> </span>&#123;</span><br><span class="line">    lock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (closed) &#123;</span><br><span class="line">            LOG.error(<span class="string">"datasource has closed ... "</span>);</span><br><span class="line">            JDBCUtils.closeConn(wrapper.getConnection());</span><br><span class="line">            <span class="keyword">return</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br></pre></td></tr></table></figure>
+
+<p>获取连接的时候也要控制一下了,如果连接池关了就不再提供连接. 目前这个逻辑还是要加的,</p>
+<p>虽然close()的时候已经把poolingCount置为0了,get的时候只能等生产线程去生产连接,但是生产线程已经被interrupt了,肯定会报错,报错的时候会结束生产线程,而这个线程一旦结束了就没有地方再启动了(虽说关闭ds后也用不到生产了),所以get的时候还是要先进行closed的判断</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Connection <span class="title">getConnection</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (!inited) &#123;</span><br><span class="line">        init();</span><br><span class="line">    &#125;</span><br><span class="line">    lock.lock();</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        <span class="keyword">if</span> (closed) &#123;</span><br><span class="line">            LOG.error(<span class="string">"datasource has closed ... "</span>);</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">        &#125;</span><br><span class="line">        ...</span><br></pre></td></tr></table></figure>
+
+<p>后续还有刚刚说的close调用时机, 配置文件升级, jmx监控, keepAlive,探活等功能要一点点加</p>
+<p>stage 8:  探活功能</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/11/18/druid连接池/" rel="next" title="druid连接池">
+                  <i class="fa fa-chevron-left"></i> druid连接池
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#连接池养成攻略"><span class="nav-number">1.</span> <span class="nav-text">连接池养成攻略</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#stage-1-容器存取"><span class="nav-number">1.1.</span> <span class="nav-text">stage 1: 容器存取</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#获取连接"><span class="nav-number">1.1.1.</span> <span class="nav-text">获取连接:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#归还连接"><span class="nav-number">1.1.2.</span> <span class="nav-text">归还连接:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#测试类"><span class="nav-number">1.1.3.</span> <span class="nav-text">测试类:</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#stage-2-最大连接"><span class="nav-number">1.2.</span> <span class="nav-text">stage 2: 最大连接</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#Holder类"><span class="nav-number">1.2.1.</span> <span class="nav-text">Holder类:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#Wrapper的改动"><span class="nav-number">1.2.2.</span> <span class="nav-text">Wrapper的改动:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#归还连接-1"><span class="nav-number">1.2.3.</span> <span class="nav-text">归还连接:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#获取连接-1"><span class="nav-number">1.2.4.</span> <span class="nav-text">获取连接:</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#stage-3-并发"><span class="nav-number">1.3.</span> <span class="nav-text">stage 3:  并发</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#目前的变量"><span class="nav-number">1.3.1.</span> <span class="nav-text">目前的变量</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#stage-4-异步创建连接"><span class="nav-number">1.4.</span> <span class="nav-text">stage 4: 异步创建连接</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#生产线程"><span class="nav-number">1.4.1.</span> <span class="nav-text">生产线程:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#消费线程"><span class="nav-number">1.4.2.</span> <span class="nav-text">消费线程:</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#stage-5-销毁连接"><span class="nav-number">1.5.</span> <span class="nav-text">stage 5: 销毁连接</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#增加的字段"><span class="nav-number">1.5.1.</span> <span class="nav-text">增加的字段:</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#销毁线程"><span class="nav-number">1.5.2.</span> <span class="nav-text">销毁线程:</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#stage-6-定时任务"><span class="nav-number">1.6.</span> <span class="nav-text">stage 6: 定时任务</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#stage-7-关闭连接池"><span class="nav-number">1.7.</span> <span class="nav-text">stage 7: 关闭连接池</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#close方法销毁自身连接"><span class="nav-number">1.7.1.</span> <span class="nav-text">close方法销毁自身连接</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#关闭连接池的影响"><span class="nav-number">1.7.2.</span> <span class="nav-text">关闭连接池的影响:</span></a></li></ol></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Swen</p>
+  <div class="site-description" itemprop="description">rain drop dida dida ~~~</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Swen</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

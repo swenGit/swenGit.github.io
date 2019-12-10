@@ -202,6 +202,88 @@
   
   
   <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/12/10/连接池养成攻略/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Swen">
+      <meta itemprop="description" content="rain drop dida dida ~~~">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lalala~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+            
+            <a href="/2019/12/10/连接池养成攻略/" class="post-title-link" itemprop="url">连接池养成攻略</a>
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-12-10 13:37:01 / 修改时间：13:52:29" itemprop="dateCreated datePublished" datetime="2019-12-10T13:37:01+08:00">2019-12-10</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="连接池养成攻略"><a href="#连接池养成攻略" class="headerlink" title="连接池养成攻略"></a>连接池养成攻略</h3><h4 id="stage-1-容器存取"><a href="#stage-1-容器存取" class="headerlink" title="stage 1: 容器存取"></a>stage 1: 容器存取</h4><p>连接池首先是一个连接的容器,用的时候直接从里边拿,close()的时候归回进去, 也就是说只需要处理好dataSource.getConnenction()和connection.close()就行了</p>
+<h5 id="获取连接"><a href="#获取连接" class="headerlink" title="获取连接:"></a>获取连接:</h5>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2019/12/10/连接池养成攻略/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/11/04/数据库营救/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -395,11 +477,19 @@
                 
               
 
-              <time title="创建时间：2019-11-18 04:20:45 / 修改时间：08:09:33" itemprop="dateCreated datePublished" datetime="2019-11-18T04:20:45+08:00">2019-11-18</time>
+              <time title="创建时间：2019-11-18 04:20:45" itemprop="dateCreated datePublished" datetime="2019-11-18T04:20:45+08:00">2019-11-18</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-12-10 13:46:38" itemprop="dateModified" datetime="2019-12-10T13:46:38+08:00">2019-12-10</time>
+              </span>
             
           
 
@@ -427,8 +517,8 @@
 </ol>
 </blockquote>
 <h3 id="2-挂上jmx测试效果"><a href="#2-挂上jmx测试效果" class="headerlink" title="2. 挂上jmx测试效果"></a>2. 挂上jmx测试效果</h3><p>jconsole是可以监控连接池的对象的,不需要额外的工具</p>
-<p><img src="/2019/11/18/druid连接池/E:%5Cblog_new%5Csource_posts%5Cdruid%E8%BF%9E%E6%8E%A5%E6%B1%A0%5Cjmx%E6%88%AA%E5%9B%BE.png" alt="jmx截图"></p>
-<h3 id="3-介绍com-alibaba-druid-pool-DruidDataSource-1-1-16"><a href="#3-介绍com-alibaba-druid-pool-DruidDataSource-1-1-16" class="headerlink" title="3. 介绍com.alibaba.druid.pool.DruidDataSource(1.1.16)"></a>3. 介绍com.alibaba.druid.pool.DruidDataSource(1.1.16)</h3><h4 id="先看类图"><a href="#先看类图" class="headerlink" title="先看类图"></a>先看类图</h4><p><img src="/2019/11/18/druid连接池/E:%5Cblog_new%5Csource_posts%5Cdruid%E8%BF%9E%E6%8E%A5%E6%B1%A0%5Cds%E7%B1%BB%E5%9B%BE.png" alt="jmx截图"></p>
+<p><img src="/2019/11/18/druid连接池/jmx%E6%88%AA%E5%9B%BE.png" alt="jmx截图"></p>
+<h3 id="3-介绍com-alibaba-druid-pool-DruidDataSource-1-1-16"><a href="#3-介绍com-alibaba-druid-pool-DruidDataSource-1-1-16" class="headerlink" title="3. 介绍com.alibaba.druid.pool.DruidDataSource(1.1.16)"></a>3. 介绍com.alibaba.druid.pool.DruidDataSource(1.1.16)</h3><h4 id="先看类图"><a href="#先看类图" class="headerlink" title="先看类图"></a>先看类图</h4><p><img src="/2019/11/18/druid连接池/ds%E7%B1%BB%E5%9B%BE.png" alt="jmx截图"></p>
 <p>简单看下这个类的上层接口们:</p>
 <p>既然这个类是连接池实现类,优先看一下DataSource那一条线</p>
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Connection的两个get方法</span></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">interface</span> <span class="title">DataSource</span>  <span class="keyword">extends</span> <span class="title">CommonDataSource</span>, <span class="title">Wrapper</span> </span>&#123;</span><br><span class="line">  <span class="function">Connection <span class="title">getConnection</span><span class="params">()</span> <span class="keyword">throws</span> SQLException</span>;</span><br><span class="line">  <span class="function">Connection <span class="title">getConnection</span><span class="params">(String username, String password)</span></span></span><br><span class="line"><span class="function">    <span class="keyword">throws</span> SQLException</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
@@ -440,7 +530,7 @@
 <p>其他接口是一些大众化的接口, 也就是说重点关注<strong>getConnection()</strong></p>
 <p>除了接口之外,更应该关注的是直接父类:DruidAbstractDataSource</p>
 <p>里边代码无数,大概扫了一下,有很多是和配置文件相关的属性管理</p>
-<p><img src="/2019/11/18/druid连接池/E:%5Cblog_new%5Csource_posts%5Cdruid%E8%BF%9E%E6%8E%A5%E6%B1%A0%5CDruidAbstractDataSource%E5%B1%80%E9%83%A8.png" alt></p>
+<p><img src="/2019/11/18/druid连接池/DruidAbstractDataSource%E5%B1%80%E9%83%A8.png" alt></p>
 <p>里边有一个需要关注的方法:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">// 连接池回收conn,而不是直接销毁,通过代理在close()方法里调用recycle()  </span><br><span class="line">// 代理部分没有找到代码,应该是这个意思</span><br><span class="line">protected abstract void recycle(DruidPooledConnection var1) throws SQLException;</span><br></pre></td></tr></table></figure>
 
@@ -1054,96 +1144,6 @@
   </article>
 
     
-        <article itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block home">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/09/17/mysql死锁日志/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="Swen">
-      <meta itemprop="description" content="rain drop dida dida ~~~">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="lalala~">
-    </span>
-      <header class="post-header">
-        <h1 class="post-title" itemprop="name headline">
-            
-            <a href="/2019/09/17/mysql死锁日志/" class="post-title-link" itemprop="url">mysql死锁日志</a>
-          
-        </h1>
-
-        <div class="post-meta">
-            <span class="post-meta-item">
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              <span class="post-meta-item-text">发表于</span>
-
-              
-                
-              
-
-              <time title="创建时间：2019-09-17 03:06:04" itemprop="dateCreated datePublished" datetime="2019-09-17T03:06:04+08:00">2019-09-17</time>
-            </span>
-          
-            
-
-            
-              <span class="post-meta-item">
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2019-09-19 15:39:48" itemprop="dateModified" datetime="2019-09-19T15:39:48+08:00">2019-09-19</time>
-              </span>
-            
-          
-
-          
-
-        </div>
-      </header>
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-          <h4 id="mysql死锁日志"><a href="#mysql死锁日志" class="headerlink" title="mysql死锁日志"></a>mysql死锁日志</h4><h5 id="故事背景"><a href="#故事背景" class="headerlink" title="故事背景"></a>故事背景</h5><p>之前学索引时看了些锁相关的知识,了解一些X锁 GAP锁的概念,应用方面却是很匮乏,群里有人提问怎么看死锁日志,我也跟着学一下</p>
-<p>这个是某同学提供的死锁日志</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/09/17/mysql死锁日志/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-    
-    
-      <footer class="post-footer">
-          <div class="post-eof"></div>
-        
-      </footer>
-  </div>
-  
-  
-  
-  </article>
-
-    
   </div>
 
   
@@ -1193,7 +1193,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">13</span>
+          <span class="site-state-item-count">14</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
