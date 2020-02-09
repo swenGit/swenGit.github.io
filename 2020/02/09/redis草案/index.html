@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="任务是做什么?外接一个redis系统, 服务器怎么搭建, spring怎么整合都不知道">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis草案">
+<meta property="og:url" content="http://yoursite.com/2020/02/09/redis草案/index.html">
+<meta property="og:site_name" content="lalala~">
+<meta property="og:description" content="任务是做什么?外接一个redis系统, 服务器怎么搭建, spring怎么整合都不知道">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-02-09T10:10:19.459Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="redis草案">
+<meta name="twitter:description" content="任务是做什么?外接一个redis系统, 服务器怎么搭建, spring怎么整合都不知道">
+  <link rel="canonical" href="http://yoursite.com/2020/02/09/redis草案/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>redis草案 | lalala~</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?dd1e5524be2b83762eb6a060ff1d5b1a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lalala~</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/02/09/redis草案/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Swen">
+      <meta itemprop="description" content="rain drop dida dida ~~~">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lalala~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">redis草案
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2020-02-09 18:03:59 / 修改时间：18:10:19" itemprop="dateCreated datePublished" datetime="2020-02-09T18:03:59+08:00">2020-02-09</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="任务是做什么"><a href="#任务是做什么" class="headerlink" title="任务是做什么?"></a>任务是做什么?</h3><p>外接一个redis系统, 服务器怎么搭建, spring怎么整合都不知道</p>
+<a id="more"></a>
+
+<h4 id="服务器搭建"><a href="#服务器搭建" class="headerlink" title="服务器搭建"></a>服务器搭建</h4><p>集群模式</p>
+<p>哨兵模式</p>
+<p>目前使用的win7单机版</p>
+<p>需要考虑的如安全性,多活</p>
+<h4 id="spring整合"><a href="#spring整合" class="headerlink" title="spring整合"></a>spring整合</h4><p>依赖:</p>
+<dependency>
+    <groupid>redis.clients</groupid>
+    <artifactid>jedis</artifactid>
+    <version>2.8.1</version>
+</dependency>
+<dependency>
+    <groupid>org.springframework.data</groupid>
+    <artifactid>spring-data-redis</artifactid>
+    <version>1.7.2.RELEASE</version>
+</dependency>
+
+<h3 id="缓存和数据库结合"><a href="#缓存和数据库结合" class="headerlink" title="缓存和数据库结合"></a>缓存和数据库结合</h3><h4 id="1-读"><a href="#1-读" class="headerlink" title="1. 读"></a>1. 读</h4><p><strong>先读缓存,如果没有,就读数据库,并将结果放入缓存中</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">-- 加索引的时候不要用双引号</span><br><span class="line">-- AUTO_INCREMENT后边要跟等号</span><br><span class="line">create table user_union_id (</span><br><span class="line">  id bigint(10) auto_increment,</span><br><span class="line">  user_id varchar(14) not null,</span><br><span class="line">  union_id varchar(40) not null,</span><br><span class="line">  create_time datetime(3) default current_timestamp(3),</span><br><span class="line">  update_time datetime(3) on update current_timestamp(3),</span><br><span class="line">  extra varchar(50) default &apos;&apos;,</span><br><span class="line">  unique key unq_uui_user_id_union_id (user_id, union_id),	</span><br><span class="line">	index idx_uui_upadate_time (update_time), </span><br><span class="line">  primary key (id)</span><br><span class="line">) ENGINE=innodb AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;</span><br></pre></td></tr></table></figure>
+
+<p><strong>java部分,以value为String为例</strong></p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> RedisTemplate redisTemplate;</span><br><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> UserUnionIdService userUnionIdService;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> Map&lt;String, Object&gt; <span class="title">findMapById</span><span class="params">(Long id)</span> </span>&#123;</span><br><span class="line">    String remind = <span class="string">"读取缓存"</span>;</span><br><span class="line">    Map result = (Map) redisTemplate.boundValueOps(<span class="string">"userUnionId-Map"</span> + id).get();</span><br><span class="line">    <span class="keyword">if</span> (result == <span class="keyword">null</span>) &#123;</span><br><span class="line">        remind = <span class="string">"读取数据库"</span>;</span><br><span class="line">        result = userUnionIdService.findMapById(id);</span><br><span class="line">        redisTemplate.boundValueOps(<span class="string">"userUnionId-Map"</span> + id).set(result);</span><br><span class="line">        redisTemplate.boundValueOps(<span class="string">"userUnionId-Map"</span> + id).expire(<span class="number">5</span>, TimeUnit.MINUTES);</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(remind);</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>经测试,使用boundValueOps格式,可以把结果强转成set时的格式,故而可以只用到boundValueOps(数据库操作)和boundListOps(双端队列)</p>
+<p>同样,也可以使用boundSetOps来储存List类型结果,删除时直接remove掉不要的元素即可,不用重置整个list(<em>@_@ 考虑一下</em>)</p>
+<p>不过不建议直接把RedisTemplate暴露在外,可以自定义一个工具类来封装RedisTemplate,见附件(用的网上现成的)</p>
+<p>注意事项:</p>
+<ol>
+<li>设置过期时间,同步问题不可避免,为了清除脏数据,一定要设置过期时间</li>
+<li>可以直接从boundValueOps里取出Map等类型并强转</li>
+<li>关于key,可以制定一个规范</li>
+<li>关于击穿问题,考虑是不是搞个null值占位符</li>
+<li>关于穿透问题,考虑数据库是不是能够抗住压力</li>
+</ol>
+<h4 id="2-写"><a href="#2-写" class="headerlink" title="2. 写"></a>2. 写</h4><p>写操作主要是加上上边说的读,并发起来会产生问题,说下几种情况:</p>
+<ol>
+<li><p><strong>先修改数据库,然后删除redis的key值. 等到有人读的时候会触发redis的新增操作</strong></p>
+<p>好处在于:</p>
+<ul>
+<li>第一套动作以删除redis为结束, 第二套动作以查询redis为开始,数据库中数据不会被覆盖</li>
+</ul>
+<p>问题在于:</p>
+<ul>
+<li>T1T2一个写,一个读:T1在修改数据库的时候,T2进行查询,会有很短时间的脏数据</li>
+<li>因为要删除redis,读操作会有击穿风险</li>
+<li>用户修改完数据后第一次查询会慢一丢丢</li>
+<li>有的数据/数据结构不适合全删掉,而是更适合部分修改</li>
+</ul>
+<p>评价:感觉还行,3个问题都不是大问题.除了被击穿攻击</p>
+</li>
+<li><p><strong>先修改数据库,然后修改redis</strong></p>
+<p>好处在于:</p>
+<ul>
+<li>不删key值,不会击穿</li>
+</ul>
+<p>问题在于:</p>
+<ul>
+<li><p>会产生脏数据</p>
+<p>T1,T2都执行写操作:T1修改了数据库后,T2修改数据库并修改redis,然后T1修改redis,之后redis是T1的,数据库是T2的</p>
+</li>
+</ul>
+<p>评价: 设置过期时间后也就没啥问题了,脏数据存活时间最多expireTime(假设是1天)</p>
+</li>
+<li><p><strong>先修改redis再修改数据库</strong>,理由同case 2.都是脏数据问题. 因此,一定要设置过期时间</p>
+</li>
+<li><p><strong>先修改数据库,然后通过定时任务来同步redis的值</strong></p>
+<p>好处在于:</p>
+<ul>
+<li>不删除key值,不会击穿</li>
+<li>redis的写操作由定时任务完成,不会出现T1T2都写时的并发问题</li>
+</ul>
+<p>问题在于:</p>
+<ul>
+<li>一个写,一个读,之后由定时任务矫正,中间会有一个延迟时间,最长可达定时任务的周期那么久</li>
+<li>定时任务如果是定期刷redis,每次都要把redis所有数据都从数据库同步一遍,数据量很大.但是定时任务的周期又不能太久,不然会上一点的延迟时间会很长</li>
+</ul>
+<p>评价:定时任务周期短些(cd=1小时),也就意味着不必等脏数据过期就会刷新掉了,cd虽长,总不会比过期时间更长. 况且虽然一直在查询数据库,但是由于是任务来做,数据库压力很平稳,不会出现波动,算是折中的方案</p>
+</li>
+<li><p><strong>先修改数据库,然后通过后管来刷redis</strong></p>
+<ul>
+<li>个人觉得这个方案给global_config那几个表用特别好,而且似乎手机就有这个套路,可以查考下</li>
+</ul>
+</li>
+</ol>
+<p>因此,只考虑最终一致性,强一致是不可能的.</p>
+<p>上述4个方案可以应对不同的业务,</p>
+<p>变形号量级较大,极少修改(但是脏数据不适宜存活太久,时间待定),不知道刷一遍redis要多久,同样不清楚安全测试对击穿的容忍度是多少(<em>@_@ 待评估</em>)</p>
+<p>短信验证码量级小,而且不用存数据库,不在讨论范围内</p>
+<p>针对case1 和case2挂两个demo</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">cleanOne</span><span class="params">(String key)</span> </span>&#123;</span><br><span class="line">    redisTemplate.delete(key);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> Map&lt;String, Object&gt; <span class="title">updateCase1</span><span class="params">(String key, Map&lt;String, Object&gt; params)</span> </span>&#123;</span><br><span class="line">    userUnionIdService.updateById(params);</span><br><span class="line">    cleanOne(key);</span><br><span class="line">    <span class="keyword">return</span> readRedis.findMapById((Long) params.get(<span class="string">"id"</span>));</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">updateCase2</span><span class="params">(String key, Map&lt;String, Object&gt; params)</span> </span>&#123;</span><br><span class="line">    userUnionIdService.updateById(params);</span><br><span class="line">    <span class="comment">// 图省事,假设params元素keys和redis正好完全一样,用params完全覆盖</span></span><br><span class="line">    redisTemplate.boundValueOps(key).set(params);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>注意事项:</p>
+<ol>
+<li>不同业务采取不同方案,这没毛病</li>
+<li>写操作比较少,可以尝试加锁,注意集群部署(redis锁/java锁),加锁的话不宜要求太高,要注意拓展性</li>
+</ol>
+<h4 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h4><p>就是setnx,基于redis的分布式锁</p>
+<p>据说Redission的分布式锁做的不错</p>
+<p>直接上demo</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setnx</span><span class="params">(String lockKey, String value, <span class="keyword">int</span> expire)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    BoundValueOperations operations = redisTemplate.boundValueOps(lockKey);</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        String setnx = (String) redisTemplate.execute((RedisCallback&lt;String&gt;) (RedisConnection connection) -&gt; &#123;</span><br><span class="line">            Object nativeConnection = connection.getNativeConnection();</span><br><span class="line">            String result = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (nativeConnection <span class="keyword">instanceof</span> JedisCommands) &#123;</span><br><span class="line">                result = ((JedisCommands) nativeConnection).set(lockKey, value, <span class="string">"NX"</span>, <span class="string">"EX"</span>, expire);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125;);</span><br><span class="line">        System.out.println(setnx);</span><br><span class="line">        System.out.println(operations.get());   <span class="comment">// null</span></span><br><span class="line">        <span class="keyword">if</span> (setnx != <span class="keyword">null</span> &amp;&amp; setnx.equals(<span class="string">"OK"</span>)) &#123;</span><br><span class="line">            System.out.println(<span class="string">"I get the exlock , hahaha "</span>);</span><br><span class="line">            doSth1();</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"waiting for the lock: "</span> + lockKey);</span><br><span class="line">            doSth2();</span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这是一个标准动作,使用匿名内部类,达到和</p>
+<blockquote>
+<p>SET resource-name anystring NX EX max-lock-time</p>
+</blockquote>
+<p>相同的效果,result==OK表示成功获取到锁,null表示失败了</p>
+<p>和setIfAbsent相比</p>
+<ul>
+<li>setIfAbsent可以取出value来,jedis拿出来是null</li>
+<li>setIfAbsent<strong>不是原子操作</strong>.</li>
+<li>如果非要用setIfAbsent,记得一定要设置过期时间和销毁lockKey</li>
+</ul>
+<p>有一个Redission工具类据说不错,(@yantao2 如果用过请评价下)</p>
+<dependency>
+  <groupid>org.redisson</groupid>
+  <artifactid>redisson</artifactid>
+  <version>3.3.2</version>
+</dependency>
+
+<h4 id="击穿穿透雪崩"><a href="#击穿穿透雪崩" class="headerlink" title="击穿穿透雪崩"></a>击穿穿透雪崩</h4><p>…</p>
+<h4 id="集群部署"><a href="#集群部署" class="headerlink" title="集群部署"></a>集群部署</h4><p>…</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2019/12/10/连接池养成攻略/" rel="next" title="连接池养成攻略">
+                  <i class="fa fa-chevron-left"></i> 连接池养成攻略
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#任务是做什么"><span class="nav-number">1.</span> <span class="nav-text">任务是做什么?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#服务器搭建"><span class="nav-number">1.1.</span> <span class="nav-text">服务器搭建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#spring整合"><span class="nav-number">1.2.</span> <span class="nav-text">spring整合</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存和数据库结合"><span class="nav-number">2.</span> <span class="nav-text">缓存和数据库结合</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-读"><span class="nav-number">2.1.</span> <span class="nav-text">1. 读</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-写"><span class="nav-number">2.2.</span> <span class="nav-text">2. 写</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分布式锁"><span class="nav-number">2.3.</span> <span class="nav-text">分布式锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#击穿穿透雪崩"><span class="nav-number">2.4.</span> <span class="nav-text">击穿穿透雪崩</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#集群部署"><span class="nav-number">2.5.</span> <span class="nav-text">集群部署</span></a></li></ol></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Swen</p>
+  <div class="site-description" itemprop="description">rain drop dida dida ~~~</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">标签</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Swen</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
