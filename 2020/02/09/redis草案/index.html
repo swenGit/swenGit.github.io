@@ -62,7 +62,7 @@
 <meta property="og:site_name" content="lalala~">
 <meta property="og:description" content="任务是做什么?外接一个redis系统, 服务器怎么搭建, spring怎么整合都不知道">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-02-09T10:13:56.731Z">
+<meta property="og:updated_time" content="2020-02-10T07:06:08.280Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="redis草案">
 <meta name="twitter:description" content="任务是做什么?外接一个redis系统, 服务器怎么搭建, spring怎么整合都不知道">
@@ -232,11 +232,19 @@
                 
               
 
-              <time title="创建时间：2020-02-09 18:03:59 / 修改时间：18:13:56" itemprop="dateCreated datePublished" datetime="2020-02-09T18:03:59+08:00">2020-02-09</time>
+              <time title="创建时间：2020-02-09 18:03:59" itemprop="dateCreated datePublished" datetime="2020-02-09T18:03:59+08:00">2020-02-09</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-02-10 15:06:08" itemprop="dateModified" datetime="2020-02-10T15:06:08+08:00">2020-02-10</time>
+              </span>
             
           
 
@@ -273,18 +281,18 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">-- 加索引的时候不要用双引号</span><br><span class="line">-- AUTO_INCREMENT后边要跟等号</span><br><span class="line">create table user_union_id (</span><br><span class="line">  id bigint(10) auto_increment,</span><br><span class="line">  user_id varchar(14) not null,</span><br><span class="line">  union_id varchar(40) not null,</span><br><span class="line">  create_time datetime(3) default current_timestamp(3),</span><br><span class="line">  update_time datetime(3) on update current_timestamp(3),</span><br><span class="line">  extra varchar(50) default &apos;&apos;,</span><br><span class="line">  unique key unq_uui_user_id_union_id (user_id, union_id),	</span><br><span class="line">	index idx_uui_upadate_time (update_time), </span><br><span class="line">  primary key (id)</span><br><span class="line">) ENGINE=innodb AUTO_INCREMENT=1 DEFAULT CHARSET=utf8;</span><br></pre></td></tr></table></figure>
 
 <p><strong>java部分,以value为String为例</strong></p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> RedisTemplate redisTemplate;</span><br><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> UserUnionIdService userUnionIdService;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> Map&lt;String, Object&gt; <span class="title">findMapById</span><span class="params">(Long id)</span> </span>&#123;</span><br><span class="line">    String remind = <span class="string">"读取缓存"</span>;</span><br><span class="line">    Map result = (Map) redisTemplate.boundValueOps(<span class="string">"userUnionId-Map"</span> + id).get();</span><br><span class="line">    <span class="keyword">if</span> (result == <span class="keyword">null</span>) &#123;</span><br><span class="line">        remind = <span class="string">"读取数据库"</span>;</span><br><span class="line">        result = userUnionIdService.findMapById(id);</span><br><span class="line">        redisTemplate.boundValueOps(<span class="string">"userUnionId-Map"</span> + id).set(result);</span><br><span class="line">        redisTemplate.boundValueOps(<span class="string">"userUnionId-Map"</span> + id).expire(<span class="number">5</span>, TimeUnit.MINUTES);</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(remind);</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> RedisTemplate redisTemplate;</span><br><span class="line"><span class="meta">@Autowired</span></span><br><span class="line"><span class="keyword">private</span> UserUnionIdService userUnionIdService;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> Map&lt;String, Object&gt; <span class="title">findMapById</span><span class="params">(Long id)</span> </span>&#123;</span><br><span class="line">    String remind = <span class="string">"读取缓存"</span>;</span><br><span class="line">    Map result = (Map) redisTemplate.boundValueOps(<span class="string">"userUnionId-Map"</span> + id).get();</span><br><span class="line">    <span class="keyword">if</span> (result == <span class="keyword">null</span>) &#123;</span><br><span class="line">        remind = <span class="string">"读取数据库"</span>;</span><br><span class="line">        result = userUnionIdService.findMapById(id);</span><br><span class="line">        redisTemplate.boundValueOps(<span class="string">"userUnionId-Map"</span> + id).set(result);</span><br><span class="line">        redisTemplate.boundValueOps(<span class="string">"userUnionId-Map"</span> + id).expire(<span class="number">5</span>, TimeUnit.MINUTES);</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(remind);</span><br><span class="line">    <span class="keyword">return</span> result;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// 单独读取redis, 用于写操作为job的方案, 可以避免击穿和穿透,但是实时性变差</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Map&lt;String, Object&gt; <span class="title">findMapByIdRedisOnly</span><span class="params">(Long id)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">return</span> (Map&lt;String, Object&gt;) redisTemplate.boundValueOps(<span class="string">"userUnionId-Map"</span> + id).get();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>经测试,使用boundValueOps格式,可以把结果强转成set时的格式,故而可以只用到boundValueOps(数据库操作)和boundListOps(双端队列)</p>
 <p>同样,也可以使用boundSetOps来储存List类型结果,删除时直接remove掉不要的元素即可,不用重置整个list(<em>@_@ 考虑一下</em>)</p>
-<p>不过不建议直接把RedisTemplate暴露在外,可以自定义一个工具类来封装RedisTemplate,见附件(用的网上现成的)</p>
+<p>不过不建议直接把RedisTemplate暴露在外,可以自定义一个工具类来封装RedisTemplate</p>
 <p>注意事项:</p>
 <ol>
 <li>设置过期时间,同步问题不可避免,为了清除脏数据,一定要设置过期时间</li>
 <li>可以直接从boundValueOps里取出Map等类型并强转</li>
 <li>关于key,可以制定一个规范</li>
-<li>关于击穿问题,考虑是不是搞个null值占位符</li>
-<li>关于穿透问题,考虑数据库是不是能够抗住压力</li>
+<li>关于穿透问题,考虑是不是搞个null值占位符</li>
+<li>关于击穿问题,考虑数据库是不是能够抗住压力</li>
 </ol>
 <h4 id="2-写"><a href="#2-写" class="headerlink" title="2. 写"></a>2. 写</h4><p>写操作主要是加上上边说的读,并发起来会产生问题,说下几种情况:</p>
 <ol>
@@ -300,7 +308,7 @@
 <li>用户修改完数据后第一次查询会慢一丢丢</li>
 <li>有的数据/数据结构不适合全删掉,而是更适合部分修改</li>
 </ul>
-<p>评价:感觉还行,3个问题都不是大问题.除了被击穿攻击</p>
+<p>评价:感觉还行,4个问题都不是大问题.除了被击穿攻击</p>
 </li>
 <li><p><strong>先修改数据库,然后修改redis</strong></p>
 <p>好处在于:</p>
@@ -317,27 +325,41 @@
 </li>
 <li><p><strong>先修改redis再修改数据库</strong>,理由同case 2.都是脏数据问题. 因此,一定要设置过期时间</p>
 </li>
-<li><p><strong>先修改数据库,然后通过定时任务来同步redis的值</strong></p>
+<li><p><strong>先update数据库,然后通过定时任务来同步redis的值</strong></p>
 <p>好处在于:</p>
 <ul>
 <li>不删除key值,不会击穿</li>
-<li>redis的写操作由定时任务完成,不会出现T1T2都写时的并发问题</li>
+<li>redis的修改操作由定时任务完成,不会出现T1T2都写时的并发问题</li>
 </ul>
 <p>问题在于:</p>
 <ul>
 <li>一个写,一个读,之后由定时任务矫正,中间会有一个延迟时间,最长可达定时任务的周期那么久</li>
 <li>定时任务如果是定期刷redis,每次都要把redis所有数据都从数据库同步一遍,数据量很大.但是定时任务的周期又不能太久,不然会上一点的延迟时间会很长</li>
 </ul>
-<p>评价:定时任务周期短些(cd=1小时),也就意味着不必等脏数据过期就会刷新掉了,cd虽长,总不会比过期时间更长. 况且虽然一直在查询数据库,但是由于是任务来做,数据库压力很平稳,不会出现波动,算是折中的方案</p>
+<p>评价:定时任务周期短些(cd=1小时),也就意味着不必等脏数据过期就会刷新掉了,cd虽长,总不会比过期时间更长. 况且虽然一直在查询数据库,但是由于是任务来做,数据库压力很平稳,不会出现波动,算是折中的方案,需要注意的是定时任务同步的时候每次都要重置下expire</p>
+</li>
+<li><p><strong>update时只改数据库,由定时任务同步redis,insert/delete是先改数据库后改redis,读的时候只读redis</strong></p>
+<p>好处在于:</p>
+<ul>
+<li>读的时候只读redis,如果不存在直接返回null,避免穿透和击穿问题</li>
+<li>delete的时候立刻同步redis,避免多于key值长时间存在</li>
+<li>insert的时候立即同步redis,减少读的时候返回null的场景</li>
+</ul>
+<p>问题在于:</p>
+<ul>
+<li>通过job同步时,中间会有一个延迟时间,此时redis不是最新数据,最长可达定时任务的周期那么久</li>
+<li>定时任务如果是定期刷redis,每次都要把redis所有数据都从数据库同步一遍,数据量很大.但是定时任务的周期又不能太久,不然会上一点的延迟时间会很长</li>
+<li>适合实时性要求不高 的场景</li>
+</ul>
 </li>
 <li><p><strong>先修改数据库,然后通过后管来刷redis</strong></p>
 <ul>
-<li>个人觉得这个方案给global_config那几个表用特别好,而且似乎手机就有这个套路,可以查考下</li>
+<li>个人觉得这个方案给global_config那几个表用特别好,而且似乎手机就有这个套路,可以参考下</li>
 </ul>
 </li>
 </ol>
 <p>因此,只考虑最终一致性,强一致是不可能的.</p>
-<p>上述4个方案可以应对不同的业务,</p>
+<p>上述6个方案可以应对不同的业务,</p>
 <p>变形号量级较大,极少修改(但是脏数据不适宜存活太久,时间待定),不知道刷一遍redis要多久,同样不清楚安全测试对击穿的容忍度是多少(<em>@_@ 待评估</em>)</p>
 <p>短信验证码量级小,而且不用存数据库,不在讨论范围内</p>
 <p>针对case1 和case2挂两个demo</p>
@@ -345,13 +367,13 @@
 
 <p>注意事项:</p>
 <ol>
-<li>不同业务采取不同方案,这没毛病</li>
+<li>不同业务采取不同方案</li>
 <li>写操作比较少,可以尝试加锁,注意集群部署(redis锁/java锁),加锁的话不宜要求太高,要注意拓展性</li>
 </ol>
 <h4 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h4><p>就是setnx,基于redis的分布式锁</p>
 <p>据说Redission的分布式锁做的不错</p>
 <p>直接上demo</p>
-<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setnx</span><span class="params">(String lockKey, String value, <span class="keyword">int</span> expire)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    BoundValueOperations operations = redisTemplate.boundValueOps(lockKey);</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        String setnx = (String) redisTemplate.execute((RedisCallback&lt;String&gt;) (RedisConnection connection) -&gt; &#123;</span><br><span class="line">            Object nativeConnection = connection.getNativeConnection();</span><br><span class="line">            String result = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (nativeConnection <span class="keyword">instanceof</span> JedisCommands) &#123;</span><br><span class="line">                result = ((JedisCommands) nativeConnection).set(lockKey, value, <span class="string">"NX"</span>, <span class="string">"EX"</span>, expire);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125;);</span><br><span class="line">        System.out.println(setnx);</span><br><span class="line">        System.out.println(operations.get());   <span class="comment">// null</span></span><br><span class="line">        <span class="keyword">if</span> (setnx != <span class="keyword">null</span> &amp;&amp; setnx.equals(<span class="string">"OK"</span>)) &#123;</span><br><span class="line">            System.out.println(<span class="string">"I get the exlock , hahaha "</span>);</span><br><span class="line">            doSth1();</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"waiting for the lock: "</span> + lockKey);</span><br><span class="line">            doSth2();</span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 获取不到锁可以有不同解决方式,以自旋为例</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setnx</span><span class="params">(String lockKey, String value, <span class="keyword">int</span> expire)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    BoundValueOperations operations = redisTemplate.boundValueOps(lockKey);</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">        String setnx = (String) redisTemplate.execute((RedisCallback&lt;String&gt;) (RedisConnection connection) -&gt; &#123;</span><br><span class="line">            Object nativeConnection = connection.getNativeConnection();</span><br><span class="line">            String result = <span class="keyword">null</span>;</span><br><span class="line">            <span class="keyword">if</span> (nativeConnection <span class="keyword">instanceof</span> JedisCommands) &#123;</span><br><span class="line">                result = ((JedisCommands) nativeConnection).set(lockKey, value, <span class="string">"NX"</span>, <span class="string">"EX"</span>, expire);</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> result;</span><br><span class="line">        &#125;);</span><br><span class="line">        System.out.println(setnx);</span><br><span class="line">        System.out.println(operations.get());   <span class="comment">// null</span></span><br><span class="line">        <span class="keyword">if</span> (setnx != <span class="keyword">null</span> &amp;&amp; setnx.equals(<span class="string">"OK"</span>)) &#123;</span><br><span class="line">            System.out.println(<span class="string">"I get the exlock , hahaha "</span>);</span><br><span class="line">            doSth1();</span><br><span class="line">            redisTemplate.delete(lockKey);</span><br><span class="line">            <span class="keyword">break</span>;</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            System.out.println(<span class="string">"waiting for the lock: "</span> + lockKey);</span><br><span class="line">            doSth2();</span><br><span class="line">            Thread.sleep(<span class="number">1000</span>);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
 <p>这是一个标准动作,使用匿名内部类,达到和</p>
 <blockquote>
@@ -367,8 +389,7 @@
 <p>有一个Redission工具类据说不错,(@_@ 如果用过请评价下)</p>
 <figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.redisson<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>redisson<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">version</span>&gt;</span>3.3.2<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
 
-<h4 id="击穿穿透雪崩"><a href="#击穿穿透雪崩" class="headerlink" title="击穿穿透雪崩"></a>击穿穿透雪崩</h4><p>…</p>
-<h4 id="集群部署"><a href="#集群部署" class="headerlink" title="集群部署"></a>集群部署</h4><p>…</p>
+<h3 id="穿透击穿雪崩"><a href="#穿透击穿雪崩" class="headerlink" title="穿透击穿雪崩"></a>穿透击穿雪崩</h3><h4 id="穿透"><a href="#穿透" class="headerlink" title="穿透"></a>穿透</h4><h4 id="击穿"><a href="#击穿" class="headerlink" title="击穿"></a>击穿</h4><h4 id="雪崩"><a href="#雪崩" class="headerlink" title="雪崩"></a>雪崩</h4><h3 id="集群部署"><a href="#集群部署" class="headerlink" title="集群部署"></a>集群部署</h3><p>…</p>
 
     </div>
 
@@ -394,6 +415,10 @@
             <span class="post-nav-divider"></span>
 
             <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2020/02/18/redis常用操作/" rel="prev" title="redis常用操作">
+                  redis常用操作 <i class="fa fa-chevron-right"></i>
+                </a>
               
             </div>
           </div>
@@ -442,7 +467,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#任务是做什么"><span class="nav-number">1.</span> <span class="nav-text">任务是做什么?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#服务器搭建"><span class="nav-number">1.1.</span> <span class="nav-text">服务器搭建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#spring整合"><span class="nav-number">1.2.</span> <span class="nav-text">spring整合</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存和数据库结合"><span class="nav-number">2.</span> <span class="nav-text">缓存和数据库结合</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-读"><span class="nav-number">2.1.</span> <span class="nav-text">1. 读</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-写"><span class="nav-number">2.2.</span> <span class="nav-text">2. 写</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分布式锁"><span class="nav-number">2.3.</span> <span class="nav-text">分布式锁</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#击穿穿透雪崩"><span class="nav-number">2.4.</span> <span class="nav-text">击穿穿透雪崩</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#集群部署"><span class="nav-number">2.5.</span> <span class="nav-text">集群部署</span></a></li></ol></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#任务是做什么"><span class="nav-number">1.</span> <span class="nav-text">任务是做什么?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#服务器搭建"><span class="nav-number">1.1.</span> <span class="nav-text">服务器搭建</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#spring整合"><span class="nav-number">1.2.</span> <span class="nav-text">spring整合</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存和数据库结合"><span class="nav-number">2.</span> <span class="nav-text">缓存和数据库结合</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#1-读"><span class="nav-number">2.1.</span> <span class="nav-text">1. 读</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#2-写"><span class="nav-number">2.2.</span> <span class="nav-text">2. 写</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分布式锁"><span class="nav-number">2.3.</span> <span class="nav-text">分布式锁</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#穿透击穿雪崩"><span class="nav-number">3.</span> <span class="nav-text">穿透击穿雪崩</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#穿透"><span class="nav-number">3.1.</span> <span class="nav-text">穿透</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#击穿"><span class="nav-number">3.2.</span> <span class="nav-text">击穿</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#雪崩"><span class="nav-number">3.3.</span> <span class="nav-text">雪崩</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#集群部署"><span class="nav-number">4.</span> <span class="nav-text">集群部署</span></a></li></ol></div>
         
       </div>
       <!--/noindex-->
@@ -457,7 +482,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">14</span>
+          <span class="site-state-item-count">15</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
