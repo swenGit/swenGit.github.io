@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="并发基础笔记 一个CPU物理上只有单线程并行,据说后边的CPU能超核,姑且算是2个并行,那么多线程开发的意义何在?  猜测:java天生就是多线程(ManagementFactory.getThreadMXBean()).与其让它闲置,还不如牺牲一些时间片管理的时间,进行充分的工作.  java线程之间是协作式的,而不是抢占式的,为了给每一个线程清理资源的时间.(所以才有线程间通讯,并且stop(">
+<meta name="keywords" content="享学">
+<meta property="og:type" content="article">
+<meta property="og:title" content="并发基础笔记">
+<meta property="og:url" content="http://yoursite.com/2020/07/13/并发基础笔记/index.html">
+<meta property="og:site_name" content="lalala~">
+<meta property="og:description" content="并发基础笔记 一个CPU物理上只有单线程并行,据说后边的CPU能超核,姑且算是2个并行,那么多线程开发的意义何在?  猜测:java天生就是多线程(ManagementFactory.getThreadMXBean()).与其让它闲置,还不如牺牲一些时间片管理的时间,进行充分的工作.  java线程之间是协作式的,而不是抢占式的,为了给每一个线程清理资源的时间.(所以才有线程间通讯,并且stop(">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-07-12T16:39:06.660Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="并发基础笔记">
+<meta name="twitter:description" content="并发基础笔记 一个CPU物理上只有单线程并行,据说后边的CPU能超核,姑且算是2个并行,那么多线程开发的意义何在?  猜测:java天生就是多线程(ManagementFactory.getThreadMXBean()).与其让它闲置,还不如牺牲一些时间片管理的时间,进行充分的工作.  java线程之间是协作式的,而不是抢占式的,为了给每一个线程清理资源的时间.(所以才有线程间通讯,并且stop(">
+  <link rel="canonical" href="http://yoursite.com/2020/07/13/并发基础笔记/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>并发基础笔记 | lalala~</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?dd1e5524be2b83762eb6a060ff1d5b1a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lalala~</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/13/并发基础笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Swen">
+      <meta itemprop="description" content="rain drop dida dida ~~~">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lalala~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">并发基础笔记
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2020-07-13 00:37:36 / 修改时间：00:39:06" itemprop="dateCreated datePublished" datetime="2020-07-13T00:37:36+08:00">2020-07-13</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h2 id="并发基础笔记"><a href="#并发基础笔记" class="headerlink" title="并发基础笔记"></a>并发基础笔记</h2><ol>
+<li>一个CPU物理上只有单线程并行,据说后边的CPU能超核,姑且算是2个并行,那么多线程开发的意义何在?</li>
+</ol>
+<p>猜测:java天生就是多线程(ManagementFactory.getThreadMXBean()).与其让它闲置,还不如牺牲一些时间片管理的时间,进行充分的工作.</p>
+<ol start="2">
+<li>java线程之间是协作式的,而不是抢占式的,为了给每一个线程清理资源的时间.(所以才有线程间通讯,并且stop()方法被取消),至于抢占式,是上下文切换的时候时间片争夺属于抢占式.</li>
+</ol>
+<a id="more"></a>
+
+<ol start="3">
+<li><p>interrupt使用(配合轮询demo)</p>
+<p>线程中断有很多种方式,如thread.suspend()–中断后不会释放资源, 设置成守护线程–宝宝线程结束后守护者立刻结束,finally都不执行. 也可以设置一个volatile的标志,不断轮询.</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">boolean</span> cannelFlag;</span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">canncel</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    cannelFlag = <span class="keyword">true</span>;</span><br><span class="line">&#125;</span><br><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (!cannelFlag) &#123;</span><br><span class="line">        System.out.println(<span class="string">"啦啦啦~"</span>);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>更保险的方案是使用中断interrupt, 这个是上一个的改进版,线程自带一个状态:中断状态,用这个来替代cannelFlag, 使用下边API进行中断状态的读写,他同样是线程安全的,并且还兼容sleep等中断异常情况.</p>
+<p>API:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 判断线程t的中断标识,默认为false</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">isInterrupted</span><span class="params">()</span></span>;</span><br><span class="line"><span class="comment">// 设置中断标识为true, 并让线程t在适当时候停止</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">interrupt</span><span class="params">()</span></span>;</span><br><span class="line"><span class="comment">// 判断线程的中断标识,并恢复中断标识为false</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">boolean</span> <span class="title">interrupted</span><span class="params">()</span></span>;</span><br><span class="line"><span class="comment">// 抛出InterruptedException时,会自动恢复中断标识为false</span></span><br><span class="line"><span class="keyword">throws</span> InterruptedException</span><br></pre></td></tr></table></figure>
+
+<p>demo</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Override</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">    <span class="keyword">while</span> (!isInterrupted()) &#123;</span><br><span class="line">        System.out.println(<span class="string">"啦啦啦~"</span>);</span><br><span class="line">        <span class="keyword">try</span> &#123;</span><br><span class="line">            sleep(<span class="number">100000</span>);</span><br><span class="line">        &#125; <span class="keyword">catch</span> (InterruptedException e) &#123;</span><br><span class="line">            System.out.println(<span class="string">"抛异常后线程状态为:"</span> + isInterrupted());</span><br><span class="line">            interrupt();</span><br><span class="line">            System.out.println(<span class="string">"抛异常后线程状态为:"</span> + isInterrupted());</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    System.out.println(<span class="string">"运行结束时线程状态为:"</span> + Thread.interrupted());</span><br><span class="line">    System.out.println(<span class="string">"运行结束时线程状态为:"</span> + isInterrupted());</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/////////////////////</span></span><br><span class="line">啦啦啦~</span><br><span class="line">抛异常后线程状态为:<span class="keyword">false</span></span><br><span class="line">抛异常后线程状态为:<span class="keyword">true</span></span><br><span class="line">运行结束时线程状态为:<span class="keyword">true</span></span><br><span class="line">运行结束时线程状态为:<span class="keyword">false</span></span><br></pre></td></tr></table></figure>
+
+<p>所以会在有的代码里见到在catch中执行打断</p>
+</li>
+<li><p>Callable的使用</p>
+<p>callable的call方法带一个出参,为了线程间通讯用.通过任务类FutureTask&lt;&gt;把callable包装成Runnable接口,感觉是包装类也像适配器,大概的结构是:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">FutureTask</span>&lt;<span class="title">V</span>&gt; <span class="keyword">implements</span> <span class="title">RunnableFuture</span>&lt;<span class="title">V</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">volatile</span> <span class="keyword">int</span> state; <span class="comment">// 线程状态,根据这个决定get()的时候要不要wait()</span></span><br><span class="line">    <span class="keyword">private</span> Callable&lt;V&gt; callable; <span class="comment">// 适配器: 本身实现一个接口,并把另一个接口注入成成员变量</span></span><br><span class="line">    <span class="keyword">private</span> V outcome; <span class="comment">// 出参</span></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">run</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        outcome = callable.call(); <span class="comment">// 此处进行了极大的精简</span></span><br><span class="line">    &#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> V <span class="title">get</span><span class="params">()</span> <span class="keyword">throws</span> InterruptedException, ExecutionException </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (state == <span class="string">"完成了"</span>) </span><br><span class="line">            <span class="keyword">return</span> outcome;</span><br><span class="line">        <span class="keyword">if</span> (state == <span class="string">"没完成"</span>)</span><br><span class="line">            wait();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>于是就用FutureTask进行callable的包装,然后按照Runnable的方式使用.</p>
+</li>
+<li><p>volatile:</p>
+<p>每次读写都从主存操作,计算的时候在L1 L2中操作.</p>
+<p>使用场景:只有一个线程写,其他线程读</p>
+<p>不适用场景: 多指令运算, 如判断后赋值,计算后赋值</p>
+</li>
+<li><p>ThreadLocal</p>
+<p>本来计划在ThreadLcoal里放一个map&lt;thread, WeakReferenceEntry&gt;,但是如果并发太高,map容量太大.</p>
+<p>后来改成在Thread里放一个map&lt;threadLocal, WeakReferenceEntry&gt;,每个线程自己维护map,value是弱引用包装类</p>
+<p>关于弱引用,存在一个内存泄露的问题:</p>
+<blockquote>
+<p>ThreadLocal内存泄漏:</p>
+</blockquote>
+</li>
+<li><p>线程协作范式</p>
+<p>一直轮询总归是不好的,既有可能响应不及时,也会消耗CPU性能. 最好是等待通知/发布订阅/park-unpark</p>
+<p>等待方:</p>
+<ol>
+<li>获取一个锁</li>
+<li>进行循环,判断条件,循环内wait</li>
+<li>循环外执行业务代码</li>
+<li>释放锁</li>
+</ol>
+<p>通知方:</p>
+<ol>
+<li>获取一个锁</li>
+<li>修改条件</li>
+<li>通知其他线程(可以是单个,可以是多个)</li>
+<li>释放锁</li>
+</ol>
+<p>加一个超时通知的demo</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// 超时等待, 业务代码条件增加了wait自然醒</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> Connection <span class="title">getConnection</span><span class="params">(<span class="keyword">long</span> millis)</span> <span class="keyword">throws</span> InterruptedException </span>&#123;</span><br><span class="line">    <span class="keyword">synchronized</span> (pool) &#123;</span><br><span class="line">        <span class="keyword">if</span> (millis &lt; <span class="number">0</span>) &#123;</span><br><span class="line">            <span class="keyword">while</span> (pool.isEmpty()) &#123;</span><br><span class="line">                wait();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> pool.pop();</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">long</span> timeout = System.currentTimeMillis() + millis;</span><br><span class="line">            <span class="keyword">long</span> remain = millis;</span><br><span class="line">            <span class="keyword">while</span> (pool.isEmpty() &amp;&amp; remain &gt; <span class="number">0</span>) &#123;</span><br><span class="line">                wait(timeout);</span><br><span class="line">                <span class="comment">// 非自然醒,刷新remain</span></span><br><span class="line">                remain = timeout - System.currentTimeMillis();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="comment">// 自然醒</span></span><br><span class="line">            <span class="keyword">if</span> (pool.isEmpty()) &#123;</span><br><span class="line">                <span class="keyword">return</span> <span class="keyword">null</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span>  pool.pop();</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">releaseConnection</span><span class="params">(Connection connection)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">synchronized</span> (pool) &#123;</span><br><span class="line">        pool.addLast(connection);</span><br><span class="line">        notifyAll();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>join方法</p>
+<p>A线程里执行 t.join(); ,A会等待t执行完毕后才继续执行. 功能上有点像CountDownLatch.await()要等待latch.countDown()到0后才会被唤醒.</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>CPU</th>
+<th>锁对象</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>yield</td>
+<td>让出</td>
+<td>不让</td>
+</tr>
+<tr>
+<td>sleep</td>
+<td>让出</td>
+<td>不让</td>
+</tr>
+<tr>
+<td>wait</td>
+<td>让出</td>
+<td>让出</td>
+</tr>
+<tr>
+<td>notify</td>
+<td>不让</td>
+<td>不让</td>
+</tr>
+<tr>
+<td></td>
+<td>让出</td>
+<td>不让</td>
+</tr>
+</tbody></table>
+</li>
+<li><p>fork-join</p>
+<p>分而治之,典型就是归并排序,把一个大任务不断地分成相似的小任务,分到阈值后再把结果统计一下.也就是递归. 有一个多线程版的分治,用的是ForkJoinPool+ForkJoinTask(RecursiveAction,RecursiveTask)</p>
+<p>demo:想要计算一个数组的所有元素之和,要求非要用分治</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">compute</span><span class="params">(<span class="keyword">int</span> fromIndex, <span class="keyword">int</span> toIndex, <span class="keyword">int</span>[] src)</span> </span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (toIndex - fromIndex &lt; threshold) &#123;</span><br><span class="line">        <span class="keyword">return</span> sum(fromIndex, toIndex, src);  <span class="comment">// 出口</span></span><br><span class="line">    &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">int</span> midIndex = (fromIndex + toIndex) / <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">int</span> left = compute(fromIndex, midIndex - <span class="number">1</span>, src);</span><br><span class="line">        <span class="keyword">int</span> right = compute(midIndex, toIndex, src);</span><br><span class="line">        <span class="keyword">return</span> left + right;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">// T(n)=O(n) + O(lgn)=O(n) 不考虑栈空间都比直接for循环成本高</span></span><br></pre></td></tr></table></figure>
+
+<p>虽然上述用递归效率还不如直接for循环,但谁让这是个练习呢. 现在要把每一个出口放在一个子线程中,强行开多线程(这个例子多线程的上下文切换成本其实比并发减少的成本还高)</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SumRSTask</span> <span class="keyword">extends</span> <span class="title">RecursiveTask</span>&lt;<span class="title">Integer</span>&gt; </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> fromIndex;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> toIndex;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span>[] src ;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">int</span> threshold;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="title">SumRSTask</span><span class="params">(<span class="keyword">int</span> fromIndex, <span class="keyword">int</span> toIndex, <span class="keyword">int</span>[] src)</span> </span>&#123;</span><br><span class="line">        ...</span><br><span class="line">        threshold = src.length / <span class="number">10</span>;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="meta">@Override</span></span><br><span class="line">    <span class="function"><span class="keyword">protected</span> Integer <span class="title">compute</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (toIndex - fromIndex &lt; threshold) &#123;</span><br><span class="line">            <span class="keyword">return</span> sum(fromIndex, toIndex, src);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            <span class="keyword">int</span> midIndex = (fromIndex + toIndex) / <span class="number">2</span>;</span><br><span class="line">            SumRSTask left = <span class="keyword">new</span> SumRSTask(fromIndex, midIndex - <span class="number">1</span>, src);</span><br><span class="line">            SumRSTask right = <span class="keyword">new</span> SumRSTask(midIndex, toIndex, src);</span><br><span class="line">            invokeAll(left, right); <span class="comment">// 执行了这两个任务,处理了线程通讯,后续可直接取出返回值</span></span><br><span class="line">            <span class="keyword">return</span> left.join() + right.join(); <span class="comment">// 直接取出返回值</span></span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        ForkJoinPool pool = <span class="keyword">new</span> ForkJoinPool();</span><br><span class="line">        <span class="keyword">int</span>[] src = MakeArray.makeArray();</span><br><span class="line">        ForkJoinTask bigTask = <span class="keyword">new</span> SumRSTask(<span class="number">0</span>, src.length - <span class="number">1</span>, src);</span><br><span class="line">        pool.invoke(bigTask);<span class="comment">//[-同步-]执行, 不执行的话join()方法会阻塞</span></span><br><span class="line">        <span class="comment">// bigTask.fork(); // 不使用pool的话可以用这个</span></span><br><span class="line">        System.out.println(bigTask.join());</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// ps:关于fork() join() invokeAll() get() 等方法的同步/异步 可以看这两个</span></span><br><span class="line">    <span class="comment">// https://www.imooc.com/article/24822</span></span><br><span class="line">    <span class="comment">// https://blog.csdn.net/hotdust/article/details/71480762</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>思路和上边递归一样,就是 <strong>①设置出口: 长度低于阈值执行业务代码, ②进行递归:长度高于阈值就进行fork(分裂)-join(合并)</strong></p>
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+          
+            
+          
+          <div class="post-tags">
+            
+              <a href="/tags/享学/" rel="tag"># 享学</a>
+            
+          </div>
+        
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/02/18/redis常用操作/" rel="next" title="redis常用操作">
+                  <i class="fa fa-chevron-left"></i> redis常用操作
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#并发基础笔记"><span class="nav-number">1.</span> <span class="nav-text">并发基础笔记</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Swen</p>
+  <div class="site-description" itemprop="description">rain drop dida dida ~~~</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">16</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Swen</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
