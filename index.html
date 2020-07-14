@@ -231,11 +231,19 @@
                 
               
 
-              <time title="创建时间：2020-07-13 00:37:36 / 修改时间：00:39:06" itemprop="dateCreated datePublished" datetime="2020-07-13T00:37:36+08:00">2020-07-13</time>
+              <time title="创建时间：2020-07-13 00:37:36" itemprop="dateCreated datePublished" datetime="2020-07-13T00:37:36+08:00">2020-07-13</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-14 13:53:19" itemprop="dateModified" datetime="2020-07-14T13:53:19+08:00">2020-07-14</time>
+              </span>
             
           
 
@@ -250,13 +258,16 @@
     <div class="post-body" itemprop="articleBody">
 
       
-          <h2 id="并发基础笔记"><a href="#并发基础笔记" class="headerlink" title="并发基础笔记"></a>并发基础笔记</h2><ol>
-<li>一个CPU物理上只有单线程并行,据说后边的CPU能超核,姑且算是2个并行,那么多线程开发的意义何在?</li>
+          <ol start="9">
+<li><h2 id="并发基础笔记"><a href="#并发基础笔记" class="headerlink" title="并发基础笔记"></a>并发基础笔记</h2></li>
 </ol>
+<ol>
+<li><p>一个CPU物理上只有单线程并行,据说后边的CPU能超核,姑且算是2个并行,那么多线程开发的意义何在?</p>
 <p>猜测:java天生就是多线程(ManagementFactory.getThreadMXBean()).与其让它闲置,还不如牺牲一些时间片管理的时间,进行充分的工作.</p>
-<ol start="2">
-<li>java线程之间是协作式的,而不是抢占式的,为了给每一个线程清理资源的时间.(所以才有线程间通讯,并且stop()方法被取消),至于抢占式,是上下文切换的时候时间片争夺属于抢占式.</li>
+</li>
 </ol>
+<ol start="2">
+<li><p>java线程之间是协作式的,而不是抢占式的,为了给每一个线程清理资源的时间.(所以才有线程间通讯,并且stop()方法被取消),至于抢占式,是上下文切换的时候时间片争夺属于抢占式.</p></li></ol>
           <!--noindex-->
           
             <div class="post-button text-center">
