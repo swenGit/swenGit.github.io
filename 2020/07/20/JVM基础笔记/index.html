@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="JVM基础笔记  CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作虚">
+<meta property="og:type" content="article">
+<meta property="og:title" content="JVM基础笔记">
+<meta property="og:url" content="http://yoursite.com/2020/07/20/JVM基础笔记/index.html">
+<meta property="og:site_name" content="lalala~">
+<meta property="og:description" content="JVM基础笔记  CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作虚">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595177289928.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595177331938.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595178645869.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595181929182.png">
+<meta property="og:updated_time" content="2020-07-19T18:31:46.470Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="JVM基础笔记">
+<meta name="twitter:description" content="JVM基础笔记  CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作虚">
+<meta name="twitter:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595177289928.png">
+  <link rel="canonical" href="http://yoursite.com/2020/07/20/JVM基础笔记/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>JVM基础笔记 | lalala~</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?dd1e5524be2b83762eb6a060ff1d5b1a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lalala~</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/07/20/JVM基础笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Swen">
+      <meta itemprop="description" content="rain drop dida dida ~~~">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lalala~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">JVM基础笔记
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2020-07-20 02:26:59 / 修改时间：02:31:46" itemprop="dateCreated datePublished" datetime="2020-07-20T02:26:59+08:00">2020-07-20</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>JVM基础笔记</p>
+<ol>
+<li><p>CPU时间片轮转个人理解(猜的,不做准)</p>
+<p>因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.</p>
+</li>
+<li><p>虚拟内存–直接内存</p>
+<p>JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作<strong>虚拟内存</strong>,分成堆–栈–方法区.</p>
+<p>此外,有的时候jvm还能操作虚拟内存外的内存,也就是<strong>直接内存</strong>.</p>
+<p><img src="/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595177289928.png" alt="1595177289928"></p>
+<a id="more"></a>
+</li>
+<li><p>栈空间分解</p>
+<p>栈空间是给运行时线程的运算使用的.每开启一个线程,就是在栈空间开辟一个线程栈.线程栈由虚拟机栈–本地方法栈–程序计数器组成. 通常占用空间最大的就是虚拟机栈.</p>
+<p>虚拟机栈里边放入了一个一个的栈帧,调用时入栈,执行完出栈.</p>
+<p>栈帧包括局部变量表–操作数栈–完成出口–动态连接, 主要运算在局部变量表和操作数栈</p>
+<p><img src="/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595177331938.png" alt="1595177331938"></p>
+</li>
+<li><p>既然是虚拟机就应该和操作系统类似,操作系统的运行部分分为<strong>CPU–缓存区–主存</strong>,可以近似的对应为<strong>jvm引擎–操作数栈–局部变量表</strong>, CPU只用来计算,不保存记录. 缓存区负责给CPU提供用于计算的值并接受CPU的运行结果,主存给缓存区提供整个运算期间的所有参数. </p>
+<p>对应过来就是:局部变量表负责储存所有局部变量,栈帧内一直有效. 操作数栈存放<strong>要进行操作的数</strong>,他们是从局部变量表(以及方法区的静态常量池–猜的)拿过来的, jvm引擎负责计算操作数栈弹出的数值.</p>
+</li>
+<li><p>一个class字节码文件反汇编(javap)后可以得到很多指令,这些指令都属于这个类的类信息</p>
+<p><img src="/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595178645869.png" alt="1595178645869"></p>
+<p>稍微解释一下:</p>
+<ul>
+<li><p>这些指令来自class类信息,运行的时候java引擎怎么知道的这些指令,我并不清楚.有人说指令储存在操作数栈中,原因参照冯诺依曼计算机模型,但我没有查过这个模型,并不是很认同.</p>
+<blockquote>
+<p><em>等看完计算机模型后,CPU轮转和指令存放应该就知道怎么回事了</em></p>
+<p>指令翻译:<a href="https://cloud.tencent.com/developer/article/1333540" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1333540</a></p>
+</blockquote>
+</li>
+<li><p>源代码为</p>
+</li>
+<li><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Person0717</span> </span>&#123;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="keyword">long</span> <span class="title">work</span><span class="params">(<span class="keyword">int</span> x)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> y = <span class="number">2</span>;</span><br><span class="line">        <span class="keyword">long</span> z = (x + y) * <span class="number">10</span>;</span><br><span class="line"><span class="comment">//        long lalala = z + y + x + 10 * x + 8;</span></span><br><span class="line">        <span class="keyword">int</span> a = x;</span><br><span class="line">        <span class="keyword">return</span> z;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">        Person0717 person0717 = <span class="keyword">new</span> Person0717();</span><br><span class="line">        person0717.work(<span class="number">1</span>);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>int a = x;这行编译的时候忽略掉了,因此上图左边看不到iload_1 istore_5对应的动作,右边的局部变量表槽位5对应的a变量在左边也看不到</p>
+</li>
+<li><p>局部变量表部分,</p>
+<p>start+length表示作用域</p>
+<p>slot为槽位,一个slot为4个字节,一般对象的引用,int,都是1个槽,short会补齐到1个,long和double占2个槽.如图中的3 4号槽被z占用了. </p>
+<p>name这个字段不一定对应的是x y z,如果编译的时候使用-g:none就看不到xyz了,也就是说局部变量名是不靠谱的</p>
+</li>
+</ul>
+</li>
+<li><p>程序计数器记录当前指令号,管理操作数栈和jvm引擎的计算指令. 也可应对CPU轮转机制</p>
+</li>
+<li><p>两个栈帧不是彼此独立的,他们的联系有二:</p>
+<ul>
+<li><p>main调用work方法时新的栈帧work入栈,work栈帧会把main栈帧的指令号保存到完成出口,当自己正常执行完后,告诉程序计数器从哪里开始跑. </p>
+<blockquote>
+<p>(异常的话不走这个)</p>
+</blockquote>
+</li>
+<li><p>传参的时候work的局部变量表会共享main的操作数栈,也就是两个栈帧有一部分是重合的</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public static void main(java.lang.String[]);</span><br><span class="line">    descriptor: ([Ljava/lang/String;)V</span><br><span class="line">    flags: ACC_PUBLIC, ACC_STATIC</span><br><span class="line">    Code:</span><br><span class="line">      stack=2, locals=2, args_size=1</span><br><span class="line">         0: new           #2                  // class swen2020/swen7777/swen0717/Person0717</span><br><span class="line">         3: dup</span><br><span class="line">         4: invokespecial #3                  // Method &quot;&lt;init&gt;&quot;:()V</span><br><span class="line">         7: astore_1            --- 1槽是person0717</span><br><span class="line">         8: aload_1             --- 加载进了操作数栈,用于操作,也是共享</span><br><span class="line">         9: iconst_1			--- 把int1放进操作数栈了</span><br><span class="line">        10: invokespecial #4                  // Method work:(I)J</span><br><span class="line">        						--- 把person0717和1都共享给了work栈帧,对应0槽和1槽,把程										序计数器的值传递给了work的返回出口,自己制成0</span><br><span class="line">        13: pop2</span><br><span class="line">        14: return</span><br><span class="line">      LineNumberTable:</span><br><span class="line">        line 18: 0</span><br><span class="line">        line 19: 8</span><br><span class="line">        line 20: 14</span><br><span class="line">      LocalVariableTable:</span><br><span class="line">        Start  Length  Slot  Name   Signature</span><br><span class="line">            0      15     0  args   [Ljava/lang/String;</span><br><span class="line">            8       7     1 person0717   Lswen2020/swen7777/swen0717/Person0717;</span><br></pre></td></tr></table></figure>
+
+
+
+</li>
+</ul>
+</li>
+</ol>
+<ol start="8">
+<li><p>虚拟机栈大小可设置,通过 -Xss1M的方式, 整体说栈一共有多大,这个不能直接设置,只能说总jvm内存里除掉堆内存和方法区之外还剩下的,栈都能用</p>
+<p>jvm启动参数参见官方文档:</p>
+<p><a href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html</a></p>
+</li>
+<li><p>堆的结构:</p>
+<p>新生代:eden+from+to,老年代. 后边详解</p>
+</li>
+<li><p>查看java进程号, ps -ef … 串台了, jps才对</p>
+</li>
+<li><p>方法区存放类信息</p>
+<p>包括class对象,类的静态变量等. 其实有三个常量池都在这里.</p>
+<p>静态常量池: 存放类的方法名,类型,直接引用,符号引用</p>
+<p>运行时常量池: 把符号引用变成了直接引用</p>
+<p>字符创常量池: 比较特殊,接口要求放在方法区,根据不同的jvm实现,把它放在了不同的地方.</p>
+</li>
+</ol>
+<p><img src="/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595181929182.png" alt="1595181929182"></p>
+<ol start="12">
+<li><p>关于符号引用和直接引用很好了解:</p>
+<p>直接引用包括基本类型和String字面量.</p>
+<p>编译期间的对象还没有创建,此时想对Person对象操作,只能通过person的变量名指代Person对象的实际地址. 等运行起来之后,堆里有了对象,引用值就能放进运行时常量池了</p>
+<p>但是字符串常量池比较奇怪,里面存的是String字面量,但是我不知道什么时候创建的.姑且认为是类装载的时候从静态常量池拿到字面量,然后在堆中创建对象后,把引用放在字符串常量池. </p>
+</li>
+<li><p>string.intern()</p>
+<p>字符串常量池不光会保存字面量,还会保存intern()后的字符串. <code>str.intern()</code>方法会检查字符串常量池(可以理解成HashTable)中有没有和str equals的元素,有的话<strong>返回</strong>这个引用,没有的话把自己放进pool中</p>
+<p>据说Twitter利用这个方法将自己的内存占用从2G缩减到几百兆:<a href="https://juejin.im/post/5d8871c76fb9a06b0703fcbe" target="_blank" rel="noopener">https://juejin.im/post/5d8871c76fb9a06b0703fcbe</a> ,个人觉得intern()存在内存泄露问题,还是要慎用.</p>
+<p>小测试:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String s3 = new String(&quot;1&quot;) + new String(&quot;1&quot;);</span><br><span class="line">String s4 = &quot;11&quot;;</span><br><span class="line">s3.intern();</span><br><span class="line">System.out.println(s3 == s4);</span><br><span class="line">System.out.println(s3.intern() == s4);</span><br><span class="line">------------</span><br><span class="line">false    true</span><br></pre></td></tr></table></figure>
+
+</li>
+</ol>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/07/13/并发基础笔记/" rel="next" title="并发基础笔记">
+                  <i class="fa fa-chevron-left"></i> 并发基础笔记
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Swen</p>
+  <div class="site-description" itemprop="description">rain drop dida dida ~~~</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Swen</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
