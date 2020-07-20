@@ -62,15 +62,15 @@
 <meta property="og:site_name" content="lalala~">
 <meta property="og:description" content="JVM基础笔记  CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作虚">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595177289928.png">
-<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595177331938.png">
-<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595178645869.png">
-<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595181929182.png">
-<meta property="og:updated_time" content="2020-07-19T18:31:46.470Z">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595177289928.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595177331938.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595178645869.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595181929182.png">
+<meta property="og:updated_time" content="2020-07-20T04:11:54.140Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM基础笔记">
 <meta name="twitter:description" content="JVM基础笔记  CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作虚">
-<meta name="twitter:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595177289928.png">
+<meta name="twitter:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595177289928.png">
   <link rel="canonical" href="http://yoursite.com/2020/07/20/JVM基础笔记/">
 
 
@@ -237,7 +237,7 @@
                 
               
 
-              <time title="创建时间：2020-07-20 02:26:59 / 修改时间：02:31:46" itemprop="dateCreated datePublished" datetime="2020-07-20T02:26:59+08:00">2020-07-20</time>
+              <time title="创建时间：2020-07-20 02:26:59 / 修改时间：12:11:54" itemprop="dateCreated datePublished" datetime="2020-07-20T02:26:59+08:00">2020-07-20</time>
             </span>
           
             
@@ -272,25 +272,25 @@
 <li><p>虚拟内存–直接内存</p>
 <p>JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作<strong>虚拟内存</strong>,分成堆–栈–方法区.</p>
 <p>此外,有的时候jvm还能操作虚拟内存外的内存,也就是<strong>直接内存</strong>.</p>
-<p><img src="/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595177289928.png" alt="1595177289928"></p>
+<p><img src="/2020/07/20/JVM基础笔记/1595177289928.png" alt="1595177289928"></p>
 <a id="more"></a>
 </li>
 <li><p>栈空间分解</p>
 <p>栈空间是给运行时线程的运算使用的.每开启一个线程,就是在栈空间开辟一个线程栈.线程栈由虚拟机栈–本地方法栈–程序计数器组成. 通常占用空间最大的就是虚拟机栈.</p>
 <p>虚拟机栈里边放入了一个一个的栈帧,调用时入栈,执行完出栈.</p>
 <p>栈帧包括局部变量表–操作数栈–完成出口–动态连接, 主要运算在局部变量表和操作数栈</p>
-<p><img src="/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595177331938.png" alt="1595177331938"></p>
+<p><img src="/2020/07/20/JVM基础笔记/1595177331938.png" alt="1595177331938"></p>
 </li>
 <li><p>既然是虚拟机就应该和操作系统类似,操作系统的运行部分分为<strong>CPU–缓存区–主存</strong>,可以近似的对应为<strong>jvm引擎–操作数栈–局部变量表</strong>, CPU只用来计算,不保存记录. 缓存区负责给CPU提供用于计算的值并接受CPU的运行结果,主存给缓存区提供整个运算期间的所有参数. </p>
 <p>对应过来就是:局部变量表负责储存所有局部变量,栈帧内一直有效. 操作数栈存放<strong>要进行操作的数</strong>,他们是从局部变量表(以及方法区的静态常量池–猜的)拿过来的, jvm引擎负责计算操作数栈弹出的数值.</p>
 </li>
 <li><p>一个class字节码文件反汇编(javap)后可以得到很多指令,这些指令都属于这个类的类信息</p>
-<p><img src="/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595178645869.png" alt="1595178645869"></p>
+<p><img src="/2020/07/20/JVM基础笔记/1595178645869.png" alt="1595178645869"></p>
 <p>稍微解释一下:</p>
 <ul>
 <li><p>这些指令来自class类信息,运行的时候java引擎怎么知道的这些指令,我并不清楚.有人说指令储存在操作数栈中,原因参照冯诺依曼计算机模型,但我没有查过这个模型,并不是很认同.</p>
 <blockquote>
-<p><em>等看完计算机模型后,CPU轮转和指令存放应该就知道怎么回事了</em></p>
+<p><em>等看完计算机模型后,CPU轮转和指令存放应该就知道怎么回事了,优先级不高</em></p>
 <p>指令翻译:<a href="https://cloud.tencent.com/developer/article/1333540" target="_blank" rel="noopener">https://cloud.tencent.com/developer/article/1333540</a></p>
 </blockquote>
 </li>
@@ -313,7 +313,7 @@
 <ul>
 <li><p>main调用work方法时新的栈帧work入栈,work栈帧会把main栈帧的指令号保存到完成出口,当自己正常执行完后,告诉程序计数器从哪里开始跑. </p>
 <blockquote>
-<p>(异常的话不走这个)</p>
+<p>异常的话走异常表, 也在javap -v中能看到</p>
 </blockquote>
 </li>
 <li><p>传参的时候work的局部变量表会共享main的操作数栈,也就是两个栈帧有一部分是重合的</p>
@@ -342,7 +342,7 @@
 <p>字符创常量池: 比较特殊,接口要求放在方法区,根据不同的jvm实现,把它放在了不同的地方.</p>
 </li>
 </ol>
-<p><img src="/2020/07/20/JVM基础笔记/.%5CJVM%E5%9F%BA%E7%A1%80%E7%AC%94%E8%AE%B0%5C1595181929182.png" alt="1595181929182"></p>
+<p><img src="/2020/07/20/JVM基础笔记/1595181929182.png" alt="1595181929182"></p>
 <ol start="12">
 <li><p>关于符号引用和直接引用很好了解:</p>
 <p>直接引用包括基本类型和String字面量.</p>
