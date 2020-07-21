@@ -55,21 +55,24 @@
   };
 </script>
 
-  <meta name="description" content="JVM基础笔记  CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作虚">
+  <meta name="description" content="JVM基础笔记 栈 CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作">
 <meta property="og:type" content="article">
 <meta property="og:title" content="JVM基础笔记">
 <meta property="og:url" content="http://yoursite.com/2020/07/20/JVM基础笔记/index.html">
 <meta property="og:site_name" content="lalala~">
-<meta property="og:description" content="JVM基础笔记  CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作虚">
+<meta property="og:description" content="JVM基础笔记 栈 CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作">
 <meta property="og:locale" content="zh-CN">
 <meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595177289928.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595177331938.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595178645869.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/JVM_Memory_Model.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595181929182.png">
-<meta property="og:updated_time" content="2020-07-20T04:11:54.140Z">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/65058-b7ce1dbc500d45e6.jpg">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/v2-5319064f2f3955635a8b2258f0e389b4_r.jpg">
+<meta property="og:updated_time" content="2020-07-21T16:55:33.770Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM基础笔记">
-<meta name="twitter:description" content="JVM基础笔记  CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作虚">
+<meta name="twitter:description" content="JVM基础笔记 栈 CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作">
 <meta name="twitter:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595177289928.png">
   <link rel="canonical" href="http://yoursite.com/2020/07/20/JVM基础笔记/">
 
@@ -237,11 +240,19 @@
                 
               
 
-              <time title="创建时间：2020-07-20 02:26:59 / 修改时间：12:11:54" itemprop="dateCreated datePublished" datetime="2020-07-20T02:26:59+08:00">2020-07-20</time>
+              <time title="创建时间：2020-07-20 02:26:59" itemprop="dateCreated datePublished" datetime="2020-07-20T02:26:59+08:00">2020-07-20</time>
             </span>
           
             
 
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-07-22 00:55:33" itemprop="dateModified" datetime="2020-07-22T00:55:33+08:00">2020-07-22</time>
+              </span>
             
           
 
@@ -265,7 +276,7 @@
 
       
         <p>JVM基础笔记</p>
-<ol>
+<h3 id="栈"><a href="#栈" class="headerlink" title="栈"></a>栈</h3><ol>
 <li><p>CPU时间片轮转个人理解(猜的,不做准)</p>
 <p>因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.</p>
 </li>
@@ -281,7 +292,7 @@
 <p>栈帧包括局部变量表–操作数栈–完成出口–动态连接, 主要运算在局部变量表和操作数栈</p>
 <p><img src="/2020/07/20/JVM基础笔记/1595177331938.png" alt="1595177331938"></p>
 </li>
-<li><p>既然是虚拟机就应该和操作系统类似,操作系统的运行部分分为<strong>CPU–缓存区–主存</strong>,可以近似的对应为<strong>jvm引擎–操作数栈–局部变量表</strong>, CPU只用来计算,不保存记录. 缓存区负责给CPU提供用于计算的值并接受CPU的运行结果,主存给缓存区提供整个运算期间的所有参数. </p>
+<li><p>既然是虚拟机就应该和操作系统类似,操作系统的运行部分分为<strong>CPU–缓存区–主存</strong>,可以近似的对应为<strong>jvm引擎–操作数栈–局部变量表</strong>, CPU只用来计算,不保存记录. 缓存区负责给CPU提供用于计算的值并接受CPU的运行结果,主存给缓存区提供整个运算期间的所有参数.  虽然是这么对比,但是实际上jvm的东西都在虚拟内存中,所以不存在像CPU-主存的硬件IO,操作数栈速度快得益于无需内存索引</p>
 <p>对应过来就是:局部变量表负责储存所有局部变量,栈帧内一直有效. 操作数栈存放<strong>要进行操作的数</strong>,他们是从局部变量表(以及方法区的静态常量池–猜的)拿过来的, jvm引擎负责计算操作数栈弹出的数值.</p>
 </li>
 <li><p>一个class字节码文件反汇编(javap)后可以得到很多指令,这些指令都属于这个类的类信息</p>
@@ -329,7 +340,12 @@
 <li><p>虚拟机栈大小可设置,通过 -Xss1M的方式, 整体说栈一共有多大,这个不能直接设置,只能说总jvm内存里除掉堆内存和方法区之外还剩下的,栈都能用</p>
 <p>jvm启动参数参见官方文档:</p>
 <p><a href="https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html" target="_blank" rel="noopener">https://docs.oracle.com/javase/8/docs/technotes/tools/unix/java.html</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">常见配置:</span><br><span class="line">-Xss设置每个线程的堆栈大小。</span><br><span class="line">-Xms设置堆的最小空间大小。</span><br><span class="line">-Xmx设置堆的最大空间大小。</span><br><span class="line">-Xmn相当于下边的那两个。</span><br><span class="line">-XX:NewSize设置新生代最小空间大小。</span><br><span class="line">-XX:MaxNewSize设置新生代最大空间大小。</span><br><span class="line">-XX:PermSize设置永久代最小空间大小。</span><br><span class="line">-XX:MaxPermSize设置永久代最大空间大小。</span><br><span class="line">-XX:+PrintGC 开启gc日志</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/07/20/JVM基础笔记/JVM_Memory_Model.png" alt></p>
 </li>
+</ol>
+<h3 id="方法区和常量池"><a href="#方法区和常量池" class="headerlink" title="方法区和常量池"></a>方法区和常量池</h3><ol start="9">
 <li><p>堆的结构:</p>
 <p>新生代:eden+from+to,老年代. 后边详解</p>
 </li>
@@ -355,6 +371,122 @@
 <p>小测试:</p>
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">String s3 = new String(&quot;1&quot;) + new String(&quot;1&quot;);</span><br><span class="line">String s4 = &quot;11&quot;;</span><br><span class="line">s3.intern();</span><br><span class="line">System.out.println(s3 == s4);</span><br><span class="line">System.out.println(s3.intern() == s4);</span><br><span class="line">------------</span><br><span class="line">false    true</span><br></pre></td></tr></table></figure>
 
+
+
+</li>
+</ol>
+<ol start="14">
+<li><p>上一个测试的升级版jkd1.8版</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">String s3 = <span class="keyword">new</span> String(<span class="string">"a"</span>) + <span class="keyword">new</span> String(<span class="string">"b"</span>);</span><br><span class="line">String s4 = s3.intern();</span><br><span class="line">String s5 = <span class="string">"ab"</span>;</span><br><span class="line">System.out.println(s3 == s4);</span><br><span class="line">System.out.println(s3 == s5);</span><br><span class="line">System.out.println(s4 == s5);</span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ol>
+<pre><code>这个考点有两个:
+
+1. 什么时候把字面量加载到字符串常量池
+
+   a b ab都属于类信息,编译的时候肯定都保存在静态常量池,类加载的时候进入运行时常量池,然后在resolve阶段将字面量加载到String常量池, 但是resolve对于字符创常量池是懒加载的,意思就是不用这个字面量的话常量池中只有一个标记,但是并没有具体的字符串. 正确的时机就是第一个 ldc 时决定是否创建
+
+2. 加载字面量的时候,字符串对象保存在哪里
+
+   这个和jdk版本有关,1.6的时候String常量池在方法区,对象也在方法区. 1.7的时候String常量池不知道在哪,但是对象是在堆中的.常量池只保留了堆中的引用.
+
+   举个例子,new String(&quot;a&quot;)创建了2个String对象(假设字面量a之前没有用过),分别为字面量a被首次ldc,开始懒加载,在堆中创建一个对象,并把引用放进池子. 然后执行new指令,创建一个String对象,内部的value指向第一个对象的value.
+
+   ![这个是创建对象的图](./JVM基础笔记/1595310524751.png)
+
+   因此,s3在堆中创建一个ab对象,s3.intern()的时候检查常量池,发现没有ab,于是把s3存进常量池,s4=&quot;ab&quot;的时候是是第一次ldc,但是发现池中已有引用,于是直接astore_3了,因此三者都是true
+
+   图中7-11-13-34这几步在下边new指令又讲.</code></pre><ol start="15">
+<li><p>他山之石:jvm系列文章</p>
+<blockquote>
+<p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI4NDY5Mjc1Mg==&amp;action=getalbum&amp;album_id=1326602114365276164&amp;subscene=159&amp;subscene=21&amp;scenenote=https%3A%2F%2Fmp.weixin.qq.com%2Fs%3F__biz%3DMzI4NDY5Mjc1Mg%3D%3D%26mid%3D2247483949%26idx%3D1%26sn%3D8b69d833bbc805e63d5b2fa7c73655f5%26chksm%3Debf6da52dc815344add64af6fb78fee439c8c27b539b3c0e87d8f6861c8422144d516ae0a837%26scene%3D21%23wechat_redirect#wechat_redirect" target="_blank" rel="noopener">https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI4NDY5Mjc1Mg==&amp;action=getalbum&amp;album_id=1326602114365276164&amp;subscene=159&amp;subscene=21&amp;scenenote=https%3A%2F%2Fmp.weixin.qq.com%2Fs%3F__biz%3DMzI4NDY5Mjc1Mg%3D%3D%26mid%3D2247483949%26idx%3D1%26sn%3D8b69d833bbc805e63d5b2fa7c73655f5%26chksm%3Debf6da52dc815344add64af6fb78fee439c8c27b539b3c0e87d8f6861c8422144d516ae0a837%26scene%3D21%23wechat_redirect#wechat_redirect</a></p>
+</blockquote>
+<p>字符串常量池文章</p>
+<blockquote>
+<p><a href="https://juejin.im/post/5c160420518825235a05301e#comment" target="_blank" rel="noopener">https://juejin.im/post/5c160420518825235a05301e#comment</a></p>
+</blockquote>
+</li>
+</ol>
+<h3 id="对象以及引用"><a href="#对象以及引用" class="headerlink" title="对象以及引用"></a>对象以及引用</h3><ol start="16">
+<li><p><strong>JVM中对象的创建过程</strong></p>
+<p><img src="/2020/07/20/JVM基础笔记/65058-b7ce1dbc500d45e6.jpg" alt="对象创建过程"></p>
+<ol>
+<li><p>(123)检查静态常量池(里边有类信息),寻找类的符号引用,如果没有,就加载类</p>
+</li>
+<li><p>(4)根据类信息计算好要分配的空间,然后通过TLAB/CAS/其他方式来分配内存</p>
+</li>
+<li><p>(5)置零, 分配内存大小的依据就是 :对象头+实例信息+空位补齐, 实例信息就是成员变量,int型预留4字节,引用类预留4字节. 这一步就是给这些成员变量设置默认值</p>
+</li>
+<li><p>设置对象头. 对象头有类信息的指针(对应第一条),还有对象的年龄,hash值,锁信息等</p>
+</li>
+</ol>
+</li>
+</ol>
+<pre><code>   以上是new指令,正常 Object o = new Object ();还会有后续两步
+
+5. 执行构造方法(init方法)
+
+6. 如果有局部变量接收的话,还会astore一下  
+
+   **于是就有了double-check单例模式里volatile问题了**
+
+   <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Single</span> </span>&#123;</span><br><span class="line">    <span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">volatile</span> Single instance;</span><br><span class="line">    <span class="function"><span class="keyword">private</span> <span class="title">Single</span><span class="params">()</span> </span>&#123;&#125;</span><br><span class="line">    <span class="function"><span class="keyword">public</span> <span class="keyword">static</span> Single <span class="title">getInstance</span><span class="params">()</span> </span>&#123;</span><br><span class="line">        <span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">            <span class="keyword">synchronized</span> (Single.class) &#123;</span><br><span class="line">                <span class="keyword">if</span> (instance == <span class="keyword">null</span>) &#123;</span><br><span class="line">                    instance = <span class="keyword">new</span> Single(); <span class="comment">// new  init  astore  </span></span><br><span class="line">                &#125;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> instance;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+   jvm存在指令重排序情况,不加volatile的话,上边new init astore三个指令顺序一乱,让astore在init 前边的话,直接就instance != null,return 刚置完零还没有初始化的instance了</code></pre><ol start="17">
+<li><p>补充上边的分配的空间</p>
+<p><img src="/2020/07/20/JVM基础笔记/v2-5319064f2f3955635a8b2258f0e389b4_r.jpg" alt="1595348511976"></p>
+</li>
+</ol>
+<p>内存分配采用两种方式:指针碰撞和空闲列表,对应整齐的内存和散装的内存</p>
+<p>TLAB和CAS是解决并发场景分配内存的方案,通常会现在eden区尝试TLAB(每个线程独享一小块内存),万一对象比较大,一个TLAB空间(1%eden)装不下,会采取CAS,如果实在是太大了,就直接装老年代</p>
+<p>加上一些GC就变成了上图了.</p>
+<ol start="18">
+<li><p>判断对象是否存活</p>
+<p>GCROOT法(可达性分析),意思就有<strong>根对象</strong>:静态变量–局部变量–常量池变量–sync对象–根对象引用的对象 等</p>
+<p>如果一个对象,向上捣,能找到根对象持有它的引用,那就是存活.</p>
+</li>
+<li><p>根可达只是一个方向,引用如果不是强引用的话,即使是根对象,也会被回收的</p>
+</li>
+</ol>
+<table>
+<thead>
+<tr>
+<th>引用</th>
+<th>定义</th>
+<th>回收</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>强引用</td>
+<td>通过等号指向对象</td>
+<td>OOM也不会回收</td>
+</tr>
+<tr>
+<td>软引用</td>
+<td>通过new SoftReference&lt;&gt;(强引用)</td>
+<td>OOM前会回收</td>
+</tr>
+<tr>
+<td>弱引用</td>
+<td>通过new WeakReference&lt;&gt;(强引用)</td>
+<td>GC的时候就会回收</td>
+</tr>
+<tr>
+<td>虚引用</td>
+<td>略</td>
+<td>略</td>
+</tr>
+</tbody></table>
+<p>注意,如果想创建一个弱引用,创建完之后一定要把强引用销毁, ref = null; 不然那个对象还是被强引用关联的</p>
+<ol start="20">
+<li><p>GC的入门</p>
+<p>minorGC使用的是复制-清除方法,把存活的对象复制到s区,然后清除eden和另一个s区. 每一次这么操作,对象的引用都会更改(疑问句)</p>
+<blockquote>
+<p>拓展: hash值是关联在对象头的,GC的时候对象内存地址更改了,native的hash值改变了么?</p>
+</blockquote>
+<p>如果对象比较大,会直接丢到老年代.如果同岁的对象们总体也很大(单个s区的一半),他们也会直接报送的老年代</p>
 </li>
 </ol>
 
@@ -430,6 +562,8 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#栈"><span class="nav-number">1.</span> <span class="nav-text">栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法区和常量池"><span class="nav-number">2.</span> <span class="nav-text">方法区和常量池</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对象以及引用"><span class="nav-number">3.</span> <span class="nav-text">对象以及引用</span></a></li></ol></div>
+        
       </div>
       <!--/noindex-->
 
