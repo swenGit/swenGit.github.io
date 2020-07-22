@@ -69,7 +69,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595181929182.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/65058-b7ce1dbc500d45e6.jpg">
 <meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/v2-5319064f2f3955635a8b2258f0e389b4_r.jpg">
-<meta property="og:updated_time" content="2020-07-21T16:55:33.770Z">
+<meta property="og:updated_time" content="2020-07-22T23:29:51.234Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM基础笔记">
 <meta name="twitter:description" content="JVM基础笔记 栈 CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作">
@@ -251,7 +251,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-22 00:55:33" itemprop="dateModified" datetime="2020-07-22T00:55:33+08:00">2020-07-22</time>
+                <time title="修改时间：2020-07-23 07:29:51" itemprop="dateModified" datetime="2020-07-23T07:29:51+08:00">2020-07-23</time>
               </span>
             
           
@@ -384,21 +384,21 @@
 </ol>
 <pre><code>这个考点有两个:
 
-1. 什么时候把字面量加载到字符串常量池
+* 什么时候把字面量加载到字符串常量池
 
-   a b ab都属于类信息,编译的时候肯定都保存在静态常量池,类加载的时候进入运行时常量池,然后在resolve阶段将字面量加载到String常量池, 但是resolve对于字符创常量池是懒加载的,意思就是不用这个字面量的话常量池中只有一个标记,但是并没有具体的字符串. 正确的时机就是第一个 ldc 时决定是否创建
+a b ab都属于类信息,编译的时候肯定都保存在静态常量池,类加载的时候进入运行时常量池,然后在resolve阶段将字面量加载到String常量池, 但是resolve对于字符创常量池是懒加载的,意思就是不用这个字面量的话常量池中只有一个标记,但是并没有具体的字符串. 正确的时机就是第一个 ldc 时决定是否创建
 
-2. 加载字面量的时候,字符串对象保存在哪里
+* 加载字面量的时候,字符串对象保存在哪里
 
-   这个和jdk版本有关,1.6的时候String常量池在方法区,对象也在方法区. 1.7的时候String常量池不知道在哪,但是对象是在堆中的.常量池只保留了堆中的引用.
+这个和jdk版本有关,1.6的时候String常量池在方法区,对象也在方法区. 1.7的时候String常量池不知道在哪,但是对象是在堆中的.常量池只保留了堆中的引用.
 
-   举个例子,new String(&quot;a&quot;)创建了2个String对象(假设字面量a之前没有用过),分别为字面量a被首次ldc,开始懒加载,在堆中创建一个对象,并把引用放进池子. 然后执行new指令,创建一个String对象,内部的value指向第一个对象的value.
+举个例子,new String(&quot;a&quot;)创建了2个String对象(假设字面量a之前没有用过),分别为字面量a被首次ldc,开始懒加载,在堆中创建一个对象,并把引用放进池子. 然后执行new指令,创建一个String对象,内部的value指向第一个对象的value.
 
-   ![这个是创建对象的图](./JVM基础笔记/1595310524751.png)
+![这个是创建对象的图](./JVM基础笔记/1595310524751.png)
 
-   因此,s3在堆中创建一个ab对象,s3.intern()的时候检查常量池,发现没有ab,于是把s3存进常量池,s4=&quot;ab&quot;的时候是是第一次ldc,但是发现池中已有引用,于是直接astore_3了,因此三者都是true
+因此,s3在堆中创建一个ab对象,s3.intern()的时候检查常量池,发现没有ab,于是把s3存进常量池,s4=&quot;ab&quot;的时候是是第一次ldc,但是发现池中已有引用,于是直接astore_3了,因此三者都是true
 
-   图中7-11-13-34这几步在下边new指令又讲.</code></pre><ol start="15">
+图中7-11-13-34这几步在下边new指令又讲.</code></pre><ol start="15">
 <li><p>他山之石:jvm系列文章</p>
 <blockquote>
 <p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI4NDY5Mjc1Mg==&amp;action=getalbum&amp;album_id=1326602114365276164&amp;subscene=159&amp;subscene=21&amp;scenenote=https%3A%2F%2Fmp.weixin.qq.com%2Fs%3F__biz%3DMzI4NDY5Mjc1Mg%3D%3D%26mid%3D2247483949%26idx%3D1%26sn%3D8b69d833bbc805e63d5b2fa7c73655f5%26chksm%3Debf6da52dc815344add64af6fb78fee439c8c27b539b3c0e87d8f6861c8422144d516ae0a837%26scene%3D21%23wechat_redirect#wechat_redirect" target="_blank" rel="noopener">https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI4NDY5Mjc1Mg==&amp;action=getalbum&amp;album_id=1326602114365276164&amp;subscene=159&amp;subscene=21&amp;scenenote=https%3A%2F%2Fmp.weixin.qq.com%2Fs%3F__biz%3DMzI4NDY5Mjc1Mg%3D%3D%26mid%3D2247483949%26idx%3D1%26sn%3D8b69d833bbc805e63d5b2fa7c73655f5%26chksm%3Debf6da52dc815344add64af6fb78fee439c8c27b539b3c0e87d8f6861c8422144d516ae0a837%26scene%3D21%23wechat_redirect#wechat_redirect</a></p>
