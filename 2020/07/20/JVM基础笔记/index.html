@@ -69,7 +69,7 @@
 <meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595181929182.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/65058-b7ce1dbc500d45e6.jpg">
 <meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/v2-5319064f2f3955635a8b2258f0e389b4_r.jpg">
-<meta property="og:updated_time" content="2020-07-22T23:29:51.234Z">
+<meta property="og:updated_time" content="2020-07-23T00:20:51.322Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM基础笔记">
 <meta name="twitter:description" content="JVM基础笔记 栈 CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作">
@@ -251,7 +251,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-23 07:29:51" itemprop="dateModified" datetime="2020-07-23T07:29:51+08:00">2020-07-23</time>
+                <time title="修改时间：2020-07-23 08:20:51" itemprop="dateModified" datetime="2020-07-23T08:20:51+08:00">2020-07-23</time>
               </span>
             
           
@@ -343,6 +343,13 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">常见配置:</span><br><span class="line">-Xss设置每个线程的堆栈大小。</span><br><span class="line">-Xms设置堆的最小空间大小。</span><br><span class="line">-Xmx设置堆的最大空间大小。</span><br><span class="line">-Xmn相当于下边的那两个。</span><br><span class="line">-XX:NewSize设置新生代最小空间大小。</span><br><span class="line">-XX:MaxNewSize设置新生代最大空间大小。</span><br><span class="line">-XX:PermSize设置永久代最小空间大小。</span><br><span class="line">-XX:MaxPermSize设置永久代最大空间大小。</span><br><span class="line">-XX:+PrintGC 开启gc日志</span><br></pre></td></tr></table></figure>
 
 <p><img src="/2020/07/20/JVM基础笔记/JVM_Memory_Model.png" alt></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">补充一些:</span><br><span class="line">-Xms和-Xmx 官方推荐要设置成一样的,因为-Xms 将要OOM时(注意不是FullGC),会申请内存,不如一步到位</span><br><span class="line">-XX:NewRatio=4 新生代和老年代的比例为1:4, 这个和-Xmn用一个就行</span><br><span class="line">老年代大小 = Xmx - Xmn; 或者 老年代大小= Xmx * (XX:NewRatio / (XX:NewRatio + 1));</span><br><span class="line">-XX:SurvivorRatio=4 单个S区和新生代的比例为1:1:4, 默认为8</span><br><span class="line">-XX:MaxTenuringThreshold=15  大对象阈值,超过就会在old创建,默认15和6</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+
 </li>
 </ol>
 <h3 id="方法区和常量池"><a href="#方法区和常量池" class="headerlink" title="方法区和常量池"></a>方法区和常量池</h3><ol start="9">
@@ -382,23 +389,26 @@
 
 </li>
 </ol>
-<pre><code>这个考点有两个:
+<pre><code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">----------------------------</span><br></pre></td></tr></table></figure>
 
-* 什么时候把字面量加载到字符串常量池
 
-a b ab都属于类信息,编译的时候肯定都保存在静态常量池,类加载的时候进入运行时常量池,然后在resolve阶段将字面量加载到String常量池, 但是resolve对于字符创常量池是懒加载的,意思就是不用这个字面量的话常量池中只有一个标记,但是并没有具体的字符串. 正确的时机就是第一个 ldc 时决定是否创建
+这个考点有两个:
 
-* 加载字面量的时候,字符串对象保存在哪里
+1. 什么时候把字面量加载到字符串常量池
 
-这个和jdk版本有关,1.6的时候String常量池在方法区,对象也在方法区. 1.7的时候String常量池不知道在哪,但是对象是在堆中的.常量池只保留了堆中的引用.
+   a b ab都属于类信息,编译的时候肯定都保存在静态常量池,类加载的时候进入运行时常量池,然后在resolve阶段将字面量加载到String常量池, 但是resolve对于字符创常量池是懒加载的,意思就是不用这个字面量的话常量池中只有一个标记,但是并没有具体的字符串. 正确的时机就是第一个 ldc 时决定是否创建
 
-举个例子,new String(&quot;a&quot;)创建了2个String对象(假设字面量a之前没有用过),分别为字面量a被首次ldc,开始懒加载,在堆中创建一个对象,并把引用放进池子. 然后执行new指令,创建一个String对象,内部的value指向第一个对象的value.
+2. 加载字面量的时候,字符串对象保存在哪里
 
-![这个是创建对象的图](./JVM基础笔记/1595310524751.png)
+   这个和jdk版本有关,1.6的时候String常量池在方法区,对象也在方法区. 1.7的时候String常量池不知道在哪,但是对象是在堆中的.常量池只保留了堆中的引用.
 
-因此,s3在堆中创建一个ab对象,s3.intern()的时候检查常量池,发现没有ab,于是把s3存进常量池,s4=&quot;ab&quot;的时候是是第一次ldc,但是发现池中已有引用,于是直接astore_3了,因此三者都是true
+   举个例子,new String(&quot;a&quot;)创建了2个String对象(假设字面量a之前没有用过),分别为字面量a被首次ldc,开始懒加载,在堆中创建一个对象,并把引用放进池子. 然后执行new指令,创建一个String对象,内部的value指向第一个对象的value.
 
-图中7-11-13-34这几步在下边new指令又讲.</code></pre><ol start="15">
+   ![这个是创建对象的图](./JVM基础笔记/1595310524751.png)
+
+   因此,s3在堆中创建一个ab对象,s3.intern()的时候检查常量池,发现没有ab,于是把s3存进常量池,s4=&quot;ab&quot;的时候是是第一次ldc,但是发现池中已有引用,于是直接astore_3了,因此三者都是true
+
+   图中7-11-13-34这几步在下边new指令又讲.</code></pre><ol start="15">
 <li><p>他山之石:jvm系列文章</p>
 <blockquote>
 <p><a href="https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI4NDY5Mjc1Mg==&amp;action=getalbum&amp;album_id=1326602114365276164&amp;subscene=159&amp;subscene=21&amp;scenenote=https%3A%2F%2Fmp.weixin.qq.com%2Fs%3F__biz%3DMzI4NDY5Mjc1Mg%3D%3D%26mid%3D2247483949%26idx%3D1%26sn%3D8b69d833bbc805e63d5b2fa7c73655f5%26chksm%3Debf6da52dc815344add64af6fb78fee439c8c27b539b3c0e87d8f6861c8422144d516ae0a837%26scene%3D21%23wechat_redirect#wechat_redirect" target="_blank" rel="noopener">https://mp.weixin.qq.com/mp/appmsgalbum?__biz=MzI4NDY5Mjc1Mg==&amp;action=getalbum&amp;album_id=1326602114365276164&amp;subscene=159&amp;subscene=21&amp;scenenote=https%3A%2F%2Fmp.weixin.qq.com%2Fs%3F__biz%3DMzI4NDY5Mjc1Mg%3D%3D%26mid%3D2247483949%26idx%3D1%26sn%3D8b69d833bbc805e63d5b2fa7c73655f5%26chksm%3Debf6da52dc815344add64af6fb78fee439c8c27b539b3c0e87d8f6861c8422144d516ae0a837%26scene%3D21%23wechat_redirect#wechat_redirect</a></p>
@@ -487,6 +497,15 @@ a b ab都属于类信息,编译的时候肯定都保存在静态常量池,类加
 <p>拓展: hash值是关联在对象头的,GC的时候对象内存地址更改了,native的hash值改变了么?</p>
 </blockquote>
 <p>如果对象比较大,会直接丢到老年代.如果同岁的对象们总体也很大(单个s区的一半),他们也会直接报送的老年代</p>
+</li>
+<li><p>记一次失败的调优</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">HashMap&lt;String, String&gt; mapName = <span class="keyword">new</span> HashMap&lt;&gt;();</span><br></pre></td></tr></table></figure>
+
+<p>至少有两点错误:</p>
+<ol>
+<li>HashMap&lt;String, String&gt;并不占用空间,占空间的是里边的Node&lt;K,V&gt;[] table, table大小是4*16000,也不算大,更大的是node中的value–也就是那10000个string. 因此创建对象的时候table和strings是一起进old区的,不存在什么map.clear();就能让string们变成野指针</li>
+<li>老年代对象不是根对象,即使table进了old,string没进去,等mapName作用域结束,map也就不是根对象了,也就是说string可以被回收(如果没有进入old的话)</li>
+</ol>
 </li>
 </ol>
 
