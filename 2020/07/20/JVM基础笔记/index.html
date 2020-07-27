@@ -69,7 +69,11 @@
 <meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595181929182.png">
 <meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/65058-b7ce1dbc500d45e6.jpg">
 <meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/v2-5319064f2f3955635a8b2258f0e389b4_r.jpg">
-<meta property="og:updated_time" content="2020-07-23T00:20:51.322Z">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595523018513.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595523045919.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595523822441.png">
+<meta property="og:image" content="http://yoursite.com/2020/07/20/JVM基础笔记/1595807636026.png">
+<meta property="og:updated_time" content="2020-07-27T00:27:55.456Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="JVM基础笔记">
 <meta name="twitter:description" content="JVM基础笔记 栈 CPU时间片轮转个人理解(猜的,不做准) 因为CPU–寄存器–缓冲区–内存–硬盘 速度越来越慢,cpu执行指令后有时需要从缓冲区甚至硬盘读取数据,这会导致CPU大部分时间处于闲置状态,为了充分利用CPU,设计了时间片轮转机制,让他可以并发处理多个操作.  虚拟内存–直接内存 JVM是Java Virtual Mechinal, java虚拟机,运行时会在主存中开辟一部分空间用作">
@@ -251,7 +255,7 @@
                   <i class="fa fa-calendar-check-o"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2020-07-23 08:20:51" itemprop="dateModified" datetime="2020-07-23T08:20:51+08:00">2020-07-23</time>
+                <time title="修改时间：2020-07-27 08:27:55" itemprop="dateModified" datetime="2020-07-27T08:27:55+08:00">2020-07-27</time>
               </span>
             
           
@@ -343,7 +347,7 @@
 <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">常见配置:</span><br><span class="line">-Xss设置每个线程的堆栈大小。</span><br><span class="line">-Xms设置堆的最小空间大小。</span><br><span class="line">-Xmx设置堆的最大空间大小。</span><br><span class="line">-Xmn相当于下边的那两个。</span><br><span class="line">-XX:NewSize设置新生代最小空间大小。</span><br><span class="line">-XX:MaxNewSize设置新生代最大空间大小。</span><br><span class="line">-XX:PermSize设置永久代最小空间大小。</span><br><span class="line">-XX:MaxPermSize设置永久代最大空间大小。</span><br><span class="line">-XX:+PrintGC 开启gc日志</span><br></pre></td></tr></table></figure>
 
 <p><img src="/2020/07/20/JVM基础笔记/JVM_Memory_Model.png" alt></p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">补充一些:</span><br><span class="line">-Xms和-Xmx 官方推荐要设置成一样的,因为-Xms 将要OOM时(注意不是FullGC),会申请内存,不如一步到位</span><br><span class="line">-XX:NewRatio=4 新生代和老年代的比例为1:4, 这个和-Xmn用一个就行</span><br><span class="line">老年代大小 = Xmx - Xmn; 或者 老年代大小= Xmx * (XX:NewRatio / (XX:NewRatio + 1));</span><br><span class="line">-XX:SurvivorRatio=4 单个S区和新生代的比例为1:1:4, 默认为8</span><br><span class="line">-XX:MaxTenuringThreshold=15  大对象阈值,超过就会在old创建,默认15和6</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">补充一些:</span><br><span class="line">-Xms和-Xmx 官方推荐要设置成一样的,因为-Xms 将要OOM时(注意不是FullGC),会申请内存,不如一步到位</span><br><span class="line">-XX:NewRatio=4 新生代和老年代的比例为1:4, 这个和-Xmn用一个就行</span><br><span class="line">老年代大小 = Xmx - Xmn; 或者 老年代大小= Xmx * (XX:NewRatio / (XX:NewRatio + 1));</span><br><span class="line">-XX:SurvivorRatio=4 单个S区和新生代的比例为1:1:4, 默认为8</span><br><span class="line">-XX:MaxTenuringThreshold=15  对象寿命,默认15(并行)和6(cms)</span><br><span class="line">-XX:PetenureSizeThreshold=4m  大对象阈值,只对串行收集器和年轻代并行收集器有效</span><br></pre></td></tr></table></figure>
 
 
 
@@ -387,12 +391,11 @@
 <figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">String s3 = <span class="keyword">new</span> String(<span class="string">"a"</span>) + <span class="keyword">new</span> String(<span class="string">"b"</span>);</span><br><span class="line">String s4 = s3.intern();</span><br><span class="line">String s5 = <span class="string">"ab"</span>;</span><br><span class="line">System.out.println(s3 == s4);</span><br><span class="line">System.out.println(s3 == s5);</span><br><span class="line">System.out.println(s4 == s5);</span><br></pre></td></tr></table></figure>
 
 
+
+
 </li>
 </ol>
-<pre><code><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">----------------------------</span><br></pre></td></tr></table></figure>
-
-
-这个考点有两个:
+<pre><code>这个考点有两个:
 
 1. 什么时候把字面量加载到字符串常量池
 
@@ -503,9 +506,220 @@
 
 <p>至少有两点错误:</p>
 <ol>
-<li>HashMap&lt;String, String&gt;并不占用空间,占空间的是里边的Node&lt;K,V&gt;[] table, table大小是4*16000,也不算大,更大的是node中的value–也就是那10000个string. 因此创建对象的时候table和strings是一起进old区的,不存在什么map.clear();就能让string们变成野指针</li>
-<li>老年代对象不是根对象,即使table进了old,string没进去,等mapName作用域结束,map也就不是根对象了,也就是说string可以被回收(如果没有进入old的话)</li>
+<li><p>HashMap&lt;String, String&gt;并不占用空间,占空间的是里边的Node&lt;K,V&gt;[] table, table大小是4*16000,也不算大,更大的是node中的value–也就是那10000个string. 因此创建对象的时候table和strings是一起进old区的,不存在什么map.clear();就能让string们变成野指针</p>
+</li>
+<li><p>老年代对象不是根对象,即使table进了old,string没进去,等mapName作用域结束,map也就不是根对象了,也就是说string可以被回收(如果没有进入old的话)</p>
+<blockquote>
+<p>大雾,跨代引用中老年代对象被当做根对象处理</p>
+</blockquote>
+</li>
 </ol>
+<p>之后尝试把S区调大一些,效果显著,姑且得出结论:</p>
+<ol>
+<li>所谓的大对象直接在老年代创建中,大对象是指数组这种,创建时就开辟的大量连续空间</li>
+<li>像demo中的巨大的HashMap在创建map时,只分配了极小的内存,引用置null. 之后执行init方法才创建其他部分,而其他部分也是散列在各处的,统一作用域的多个小对象. 这正好符合S区同龄对象的标准.</li>
+<li>因此hashmap这种进入老年代的瓶颈在于S区.</li>
+<li>S=O(Xmn,SRatio); <ul>
+<li>提高年轻代大小同时提高Xmx,对硬件内存有要求</li>
+<li>改变SRatio,会让eden变少,也就是minorGC更频繁. 反之,eden变大,S区会有同龄对象偷渡到old区,增加majorGC频率</li>
+</ul>
+</li>
+</ol>
+</li>
+</ol>
+<h3 id="GC"><a href="#GC" class="headerlink" title="GC"></a>GC</h3><p>以下因为电脑蓝屏,1个半小时笔记丢失,不想好好写了,直接上结论.</p>
+<ol start="22">
+<li><p>内存分代原因,为了提高整体GC效率</p>
+<ol>
+<li>绝大多数对象朝生夕死,没资格活到下次GC    新生代</li>
+<li>一部分对象挺过一阵子后获得特别久               老年代</li>
+</ol>
+</li>
+<li><p>三种GC算法</p>
+<ul>
+<li><p>复制算法</p>
+<p>分区为使用区和预留区. GC时存活对象复制到预留区,然后格式化使用区. 之后使用区变预留区.</p>
+<p>升级版是eden:s0:s1,s0和s1轮流做预留区(因为存活对象很少).采用老年代担保策略,同龄对象超过s的一半,或者s装不下了,就把对应对象偷渡到老年代. 此外,15岁对象自然升级到老年代</p>
+</li>
+<li><p>标记清除</p>
+<p>STW,扫描标记,之后再扫描,统一清除. 效率不如复制,会产生内存碎片.适用于存活比较多的场景</p>
+</li>
+<li><p>标记整理</p>
+<p>STW,扫描标记,之后再扫描,统一整理到一块. 效率不如标记整理,不会产生内存碎片.但整理的时候对象内存会变.    </p>
+<p>注意:老年代空间通常比新生代要大,存活对象更是多的多</p>
+</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>复制</th>
+<th>标记清除</th>
+<th>标记整理</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>场景</td>
+<td>新生代</td>
+<td>老年代</td>
+<td>老年代</td>
+</tr>
+<tr>
+<td>效率</td>
+<td>高</td>
+<td>中</td>
+<td>低</td>
+</tr>
+<tr>
+<td>内存碎片</td>
+<td>无</td>
+<td>有</td>
+<td>无</td>
+</tr>
+<tr>
+<td>内存地址</td>
+<td>s区会变</td>
+<td>不会</td>
+<td>全都会</td>
+</tr>
+<tr>
+<td>扫描次数</td>
+<td>1</td>
+<td>2</td>
+<td>2</td>
+</tr>
+<tr>
+<td>STW</td>
+<td>会</td>
+<td>会,但清除可以偷偷进行</td>
+<td>会,最慢</td>
+</tr>
+</tbody></table>
+</li>
+</ol>
+<ol start="24">
+<li><p>STW</p>
+<p>StopTheWorld, GC的时候不适合创建新对象,因此gc通常会阻塞业务线程,会引起响应时间变长,甚至超时</p>
+</li>
+<li><p>GCor,垃圾回收器</p>
+<p>Serial  单线程gc, 阻塞业务, stw长, 最垃圾的垃圾回收器</p>
+<p>Parallel 多线程gc,阻塞业务, stw略长,支持几个G的内存,效率很高,但是单次stw长</p>
+<p>Parallel是默认</p>
+<p><img src="/2020/07/20/JVM基础笔记/1595523018513.png" alt="1595523018513"></p>
+</li>
+<li><p>CMS</p>
+<p><strong>CMS</strong>,并发标记清除,进行3次标记,第一次阻塞,找到原始根对象,然后一个CPU负责gc,其他CPU走业务. gc的时候标记原始根对象的下挂对象,但是由于业务会动,可能会创建新对象,可能会产生新垃圾,因此标记会漏标.</p>
+<p>第三次标记会阻塞,找回并发标记的问题.over.</p>
+<p>清理的时候采用并发清理,处理之前标记的对象. 但是这个阶段业务会产生新的垃圾,这些垃圾只能下次清理.称之为 <strong>浮动垃圾</strong>.</p>
+<p>因此GC时要预留一部分空间存放浮动垃圾,CMS专属参数:-XX:……</p>
+<p>但是,如果预留了200M,清除的时候却产生了1000M的浮动垃圾,CMS回收器会降级成最垃圾的回收器:Serial!!!!</p>
+<p>此外,由于会有专门的CPU处理gc,对CPU性能有要求,标记清除还会产生内存碎片</p>
+<p>顺便,和CMS对应的新生代回收器叫ParNew.</p>
+<p>STW很小了.</p>
+<p><img src="/2020/07/20/JVM基础笔记/1595523045919.png" alt="1595523045919"></p>
+</li>
+<li><p>G1</p>
+<p>G1是个异教徒. 在他看来,什么-Xmn -XX:S…Ratio都不用.他的内存不是eden+s0+s1+old,而是密密麻麻的无数个region,一个region大概1m~32m,可以表示e区,s区,o区和h区(大对象),</p>
+<p>原理为止,特点就是STW非常小.筛选回收就是可以一次只回收一部分region,而不是整个old区这么搞. 凭借着筛选回收的特点,G1回收器可以做到可预测停顿,如预期10ms就回收15%内存.</p>
+</li>
+</ol>
+<p><img src="/2020/07/20/JVM基础笔记/1595523822441.png" alt="1595523822441"></p>
+<h3 id="标记–跨代引用"><a href="#标记–跨代引用" class="headerlink" title="标记–跨代引用"></a>标记–跨代引用</h3><ol start="28">
+<li><p>三色标记与漏标</p>
+<p>标记-复制  标记-清除 标记-整理 等标记,要标记对象是否要回收,有一种三色标记的方式用于处理并发标记.</p>
+<p>三色分别为:</p>
+<p>黑色: 根对象,并且是下级子对象全部被标记完的根对象</p>
+<p>灰色: 根对象,但是是下级子对象还没有标记完的根对象,就类似于一个中间态</p>
+<p>白色: 没有被标记过的对象</p>
+<p><img src="/2020/07/20/JVM基础笔记/1595807636026.png" alt="1595807636026"></p>
+<blockquote>
+<p>可以好好这种中间态的使用场景</p>
+</blockquote>
+<p>如果和业务线程并发,会出现漏标问题,如:</p>
+<p>GC线程1执行完了,线程2刚标记到B对象,但是业务线程做了一个操作</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">A.field = C;</span><br><span class="line">B.field = <span class="keyword">null</span>;</span><br></pre></td></tr></table></figure>
+
+<p>导致B由于没有子对象而直接变黑,但由于线程1已经结束,C不会被标记,产生漏标.</p>
+</li>
+</ol>
+<ol start="29">
+<li><p>三次标记为初始标记,并发标记,最终标记. CMS和G1是如何处理并发标记的漏标</p>
+<ul>
+<li><p>CMS</p>
+<p>关注增量: Incremental Update算法</p>
+<p>既然做了A.field = C;的操作,就说明C增加到扫描树了,这时把A退化成灰色,告诉最终标记,A这个对象要重新扫描一遍. 当然,为了保险起见,GC线程会从初始根对象开始扫描,而不是直接从A扫描.</p>
+<p>因此会产生一定的重复操作,时间复杂度也比较高.</p>
+<blockquote>
+<p>到底是最终标记进行重新扫描还是并发标记再次扫描</p>
+</blockquote>
+</li>
+<li><p>G1</p>
+<p>快照,关注减量:STAB算法 snapshot table at beginning</p>
+<p>开始的时候先保存一个快照,当执行B.field = null;的时候,对比一下快照,对照着改变量重新进行扫描</p>
+<blockquote>
+<p>这个不是很理解,再查查资料</p>
+</blockquote>
+</li>
+</ul>
+</li>
+<li><p>跨代引用</p>
+<p>老年代调用了新生代,老年代会被当做GCRoot对象,因此做minorGC的时候要扫描老年代,看有没有跨代引用.但这个显然是不可能的.于是采用RSet+CardTable来进行定区扫描.</p>
+<ol>
+<li><p>根据引用的两个对象的内存地址可以判断是不是跨代引用.</p>
+</li>
+<li><p>在Eden区保存一个map–叫做记录集RSet,里边记录了跨代引用以及对应的老年代对象在内存的位置</p>
+</li>
+<li><p>由于老年代对象大多采用标记整理的方法,记录老年代内存位置不是很好维护,采用CardTable进行老年代的分块记录</p>
+</li>
+<li><p>CardTable是一个数组,jvm把老年代分成n块,每一块分别对应CardTable的一个索引,数组的值为1和0,分别表示该区域有没有老年代对象跨代引用eden区.</p>
+</li>
+<li><p>这样RSet里边只用记录跨代引用和这个引用对应的CardTable下标即可,minorGC时会扫描下标对应的那一块老年代区域.不是全盘扫描,也不是定点扫描.</p>
+</li>
+</ol>
+<blockquote>
+<p>思考,为什么RSet不做成定点记录</p>
+</blockquote>
+<ul>
+<li><p>CMS</p>
+<p>CMS就是这么做的,一个Eden区和一个Old区.Eden维护RSet,CardTable记录Old区</p>
+</li>
+<li><p>G1</p>
+<p>G1有多个Eden区,并且不知道具体谁是Old区,因此每一个E区(不确定有没有S区)都维护了一份RSet,CardTable记录的是整个内存.并且CardTable分块直接采用region的大小进行分块.</p>
+<p>而一些场景会出现一个E区的20%都是RSet,这个也要求G1回收器的内存特别大. </p>
+<blockquote>
+<ol>
+<li>雾,G1的跨代引用是不是大于CMS的需要确认一下,因为总体上来说跨代引用的引用就那么多个</li>
+<li>通常G1要求内存多大?</li>
+</ol>
+</blockquote>
+<p>CardTable按照Region分割,因此Region要2的n次方</p>
+</li>
+</ul>
+</li>
+<li><p>安全点和安全区域的概念(初始标记最终标记)</p>
+<p>GC的工作在很多时候都是会阻塞业务线程的,假如业务线程正在创建对象或者改变引用,刚改变一半的时候,JVM无法判断原来的引用是不是垃圾,也就是说这个时间点不适合进行GC. 因此会有一个机制,jvm打算进行GC了,不会立即中断所有业务线程,而是让业务线程执行到一个便于GC的安全位置,然后再中断他.(有点类似有中断标志,这个叫做gcstart标记)</p>
+<ul>
+<li><p>安全点</p>
+<p>这个便于GC的安全位置就是安全点,通常是<strong>方法调用,进行返回</strong>的时候. 这些安全点,业务线程会进行轮询一下gcstart.</p>
+<blockquote>
+<p>minorGC的时候会不会STW?</p>
+</blockquote>
+</li>
+<li><p>安全区域</p>
+<p>如果这个业务线程是挂起状态,不会自主的进入安全点轮询,这样GC就不知道这个线程是不是准备好了,于是引入了安全区域的概念. 安全区域就是改区域都不用管该线程,如果GC的时候这个线程苏醒了,出安全区的时候检查一下GC有没有结束,没有结束就进行中断.</p>
+</li>
+</ul>
+</li>
+<li><p>垃圾回收器三项指标</p>
+<p>内存占用: </p>
+<p>​    CMS的浮动内存要求老年代达到90%就必须GC,会浪费一些内存</p>
+<p>​    复制算法的预留区</p>
+<p>​    G1的散落的RSet</p>
+<p>吞吐量:</p>
+<p>​    GC所用的时间越少越好,处理业务的时间越长越好</p>
+<p>停顿时间</p>
+<p>​    GC的时候能不STW就不STW,GC总时间虽然长了,但是由于并发标记,停顿时间反而少了.</p>
+<p>各GCor使用场景对比:</p>
 </li>
 </ol>
 
@@ -581,7 +795,7 @@
 
       <!--noindex-->
       <div class="post-toc-wrap sidebar-panel">
-          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#栈"><span class="nav-number">1.</span> <span class="nav-text">栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法区和常量池"><span class="nav-number">2.</span> <span class="nav-text">方法区和常量池</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对象以及引用"><span class="nav-number">3.</span> <span class="nav-text">对象以及引用</span></a></li></ol></div>
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#栈"><span class="nav-number">1.</span> <span class="nav-text">栈</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#方法区和常量池"><span class="nav-number">2.</span> <span class="nav-text">方法区和常量池</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#对象以及引用"><span class="nav-number">3.</span> <span class="nav-text">对象以及引用</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#GC"><span class="nav-number">4.</span> <span class="nav-text">GC</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#标记–跨代引用"><span class="nav-number">5.</span> <span class="nav-text">标记–跨代引用</span></a></li></ol></div>
         
       </div>
       <!--/noindex-->
