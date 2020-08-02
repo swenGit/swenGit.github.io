@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="linux 获取超级用户权限  su  安装东西  yum install xxx  vim里上下左右变成ABCD 定位问题,服务器还是远程工具: 远程工具的话,关掉仿真–模式–光标模式 服务器的话,切换vim版本: sudo yum remove vim-common sudo yum  install vim  vim替换字符串 1:%s/str0/str1/g     ---- 把str0变">
+<meta property="og:type" content="article">
+<meta property="og:title" content="lalala~">
+<meta property="og:url" content="http://yoursite.com/2020/08/03/常用命令/index.html">
+<meta property="og:site_name" content="lalala~">
+<meta property="og:description" content="linux 获取超级用户权限  su  安装东西  yum install xxx  vim里上下左右变成ABCD 定位问题,服务器还是远程工具: 远程工具的话,关掉仿真–模式–光标模式 服务器的话,切换vim版本: sudo yum remove vim-common sudo yum  install vim  vim替换字符串 1:%s/str0/str1/g     ---- 把str0变">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2020/08/03/常用命令/1596311766373.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/03/常用命令/F:%5CJAVA%E7%AC%94%E8%AE%B0%5C%E5%91%A8%E6%8A%A5%5Credis%5CredisCluster%5C1596371689725.png">
+<meta property="og:updated_time" content="2020-08-02T16:20:01.881Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="lalala~">
+<meta name="twitter:description" content="linux 获取超级用户权限  su  安装东西  yum install xxx  vim里上下左右变成ABCD 定位问题,服务器还是远程工具: 远程工具的话,关掉仿真–模式–光标模式 服务器的话,切换vim版本: sudo yum remove vim-common sudo yum  install vim  vim替换字符串 1:%s/str0/str1/g     ---- 把str0变">
+<meta name="twitter:image" content="http://yoursite.com/2020/08/03/常用命令/1596311766373.png">
+  <link rel="canonical" href="http://yoursite.com/2020/08/03/常用命令/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title> | lalala~</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?dd1e5524be2b83762eb6a060ff1d5b1a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lalala~</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/03/常用命令/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Swen">
+      <meta itemprop="description" content="rain drop dida dida ~~~">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lalala~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2020-08-03 00:20:15 / 修改时间：00:20:01" itemprop="dateCreated datePublished" datetime="2020-08-03T00:20:15+08:00">2020-08-03</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h3 id="linux"><a href="#linux" class="headerlink" title="linux"></a>linux</h3><ol>
+<li><p>获取超级用户权限  su</p>
+</li>
+<li><p>安装东西  yum install xxx</p>
+</li>
+<li><p>vim里上下左右变成ABCD</p>
+<p>定位问题,服务器还是远程工具:</p>
+<p>远程工具的话,关掉仿真–模式–光标模式</p>
+<p>服务器的话,切换vim版本:</p>
+<p><strong>sudo yum remove vim-common</strong></p>
+<p><strong>sudo yum  install vim</strong></p>
+</li>
+<li><p>vim替换字符串</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">:%s/str0/str1/g     ---- 把str0变成str1</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>后台运行,命令后边加上 ‘ &amp;’</p>
+</li>
+<li><p>网络问题</p>
+<ul>
+<li><p>ping</p>
+</li>
+<li><p>telnet 6379 : 验证端口号是否开放</p>
+</li>
+<li><p>netstat -anp | grep 6379 看看是不是listen</p>
+</li>
+<li><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">  netstat是一个非常有用的查看端口状态的命令，执行netstat命令后，请注意查看以下信息：</span><br><span class="line">（1）目标端口是否处于监听状态？</span><br><span class="line">（2）目标端口上是否存在已成功建立的TCP连接（ESTABLISHED）？其数量是多少？</span><br><span class="line">（3）是否存在半开连接（SYN_RECV）？其数量是多少？</span><br><span class="line">（4）是否存在等待关闭的连接（TIME_WAIT）？其数量是多少？</span><br></pre></td></tr></table></figure>
+
+</li>
+</ul>
+<p>把redis.conf中127.0.0.1:6379改成0.0.0.0:6379,之后关闭了linux防火墙后问题修复</p>
+</li>
+<li><p>带行数打开文件  -n  -N</p>
+</li>
+</ol>
+<h3 id="redis集群"><a href="#redis集群" class="headerlink" title="redis集群"></a>redis集群</h3><h4 id="集群部署"><a href="#集群部署" class="headerlink" title="集群部署"></a>集群部署</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"># --replicas 1 表示一主一从</span><br><span class="line">./redis-trib.rb create --replicas 1 192.168.159.132:6379 192.168.159.132:6380 192.168.159.132:6381 192.168.159.132:6389 192.168.159.132:6390 192.168.159.132:6391</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./redis-trib.rb reshard 192.168.42.111:6382</span><br></pre></td></tr></table></figure>
+
+<h4 id="启动server"><a href="#启动server" class="headerlink" title="启动server"></a>启动server</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./redis-server clusterconf/redis6379.conf &amp;</span><br></pre></td></tr></table></figure>
+
+<h4 id="连接redis"><a href="#连接redis" class="headerlink" title="连接redis"></a>连接redis</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">./redis-cli -h 192.168.159.132 -p 6379 -a 12345678 -c</span><br><span class="line">a是密码  c是集群</span><br></pre></td></tr></table></figure>
+
+<h4 id="查看节点"><a href="#查看节点" class="headerlink" title="查看节点"></a>查看节点</h4><blockquote>
+<p>官方文档:<a href="https://redis.io/commands/cluster-nodes" target="_blank" rel="noopener">https://redis.io/commands/cluster-nodes</a></p>
+</blockquote>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cluster nodes</span><br></pre></td></tr></table></figure>
+
+<h4 id="查看key对应的槽"><a href="#查看key对应的槽" class="headerlink" title="查看key对应的槽"></a>查看key对应的槽</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">CLUSTER KEYSLOT name</span><br></pre></td></tr></table></figure>
+
+<blockquote>
+<p>如果第一次出现<code>{</code>和第一次出现<code>}</code>之间有一个或多个字符, 只计算这里边的字符</p>
+<p>如 {10001}:666 == 10001  == user:{10001}:account</p>
+<p>是否便于统计???? 如某个表的key值?</p>
+</blockquote>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// JedisClusterCRC16</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">int</span> <span class="title">getSlot</span><span class="params">(<span class="keyword">byte</span>[] key)</span> </span>&#123;</span><br><span class="line">        <span class="keyword">int</span> s = -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">int</span> e = -<span class="number">1</span>;</span><br><span class="line">        <span class="keyword">boolean</span> sFound = <span class="keyword">false</span>;</span><br><span class="line">        <span class="comment">// 判断&#123;&#125;</span></span><br><span class="line">        <span class="keyword">for</span>(<span class="keyword">int</span> i = <span class="number">0</span>; i &lt; key.length; ++i) &#123;</span><br><span class="line">            <span class="keyword">if</span> (key[i] == <span class="number">123</span> &amp;&amp; !sFound) &#123;</span><br><span class="line">                s = i;</span><br><span class="line">                sFound = <span class="keyword">true</span>;</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">if</span> (key[i] == <span class="number">125</span> &amp;&amp; sFound) &#123;</span><br><span class="line">                e = i;</span><br><span class="line">                <span class="keyword">break</span>;</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> s &gt; -<span class="number">1</span> &amp;&amp; e &gt; -<span class="number">1</span> &amp;&amp; e != s + <span class="number">1</span> ? getCRC16(key, s + <span class="number">1</span>, e) &amp; <span class="number">16383</span> : getCRC16(key) &amp; <span class="number">16383</span>;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="清空数据"><a href="#清空数据" class="headerlink" title="清空数据"></a>清空数据</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">flushall</span><br></pre></td></tr></table></figure>
+
+<h4 id="查看数据"><a href="#查看数据" class="headerlink" title="查看数据"></a>查看数据</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">keys *    -- 只能看当前节点</span><br></pre></td></tr></table></figure>
+
+<h4 id="集群限制"><a href="#集群限制" class="headerlink" title="集群限制"></a>集群限制</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a，键的批量操作支持有限，比如mset, mget，如果多个键映射在不同的槽，就不支持了mset name james age 19</span><br><span class="line">b，键事务支持有限，当多个键分布在不同节点时无法使用事务，同一节点是支持事务</span><br><span class="line">c，键是数据分区的最小粒度，不能将一个很大的键值对映射到不同的节点</span><br><span class="line">d，不支持多数据库，只有0，select 0</span><br><span class="line">e，复制结构只支持单层结构，不支持树型结构。</span><br></pre></td></tr></table></figure>
+
+<h4 id="主-处理业务-从-备份-高可用"><a href="#主-处理业务-从-备份-高可用" class="headerlink" title="主: 处理业务 从:备份,高可用"></a>主: 处理业务 从:备份,高可用</h4><p>java连接哨兵,哨兵监督管理redis,redis出现主从变动,哨兵自动更新.java会根据哨兵找到主节点.</p>
+<p>java连接主节点,主从发生变动,java还要改代码.</p>
+<p>哨兵个数必须是单数,为了当master节点fail的时候选举. 哨兵个数和redis个数没关系,可以让一个哨兵监督1组redis:1个master2个slaver</p>
+<p>cluster</p>
+<h4 id="节点的奇偶性"><a href="#节点的奇偶性" class="headerlink" title="节点的奇偶性:"></a>节点的奇偶性:</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">如果是一主一从,个数随意</span><br><span class="line">如果是一主多从,主节点建议为偶数</span><br></pre></td></tr></table></figure>
+
+<p><img src="/2020/08/03/常用命令/1596311766373.png" alt="1596311766373"></p>
+<p>节点A发现和B的最后通信时间超过一定时间后标记为pfail状态,然后通知其他节点,如果加起来超过一半认为节点B有问题,就会把B下线. </p>
+<blockquote>
+<p>所以节点数为偶数比较好</p>
+</blockquote>
+<p>如果节点B正好是主节点,麾下的从节点要选举,所有有槽位的主节点参与选举,同样超过一半者获胜</p>
+<blockquote>
+<p>所以一主多从的时候主节点数为偶数比较好</p>
+</blockquote>
+<h3 id="lua脚本"><a href="#lua脚本" class="headerlink" title="lua脚本"></a>lua脚本</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">eval lua-script key-num [key1 key2 key3 ....] [value1 value2 value3 ....]</span><br></pre></td></tr></table></figure>
+
+<p>如:  </p>
+<p>eval “redis.call(‘set’, KEYS[1], ARGV[1])” 1 key1 val1</p>
+<p>eval “return redis.call(‘get’, KEYS[1])” 1 key1 </p>
+<p><img src="/2020/08/03/常用命令/F:%5CJAVA%E7%AC%94%E8%AE%B0%5C%E5%91%A8%E6%8A%A5%5Credis%5CredisCluster%5C1596371689725.png" alt="1596371689725"></p>
+<p>对应在java里就是</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@Test</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">evalTest</span><span class="params">()</span> <span class="keyword">throws</span> Exception</span>&#123;</span><br><span class="line">  	 jedisCluster.eval(<span class="string">"redis.call('set', KEYS[1], ARGV[1], ARGV[2], ARGV[3], 'NX')"</span>, <span class="number">1</span>, <span class="string">"key01"</span>, <span class="string">"value01"</span>, <span class="string">"EX"</span>, <span class="string">"10000"</span>);</span><br><span class="line">  	 Object o = jedisCluster.eval(<span class="string">"return redis.call('get', KEYS[1])"</span>, <span class="number">1</span>, <span class="string">"key01"</span>);</span><br><span class="line">  	 System.out.println(o);</span><br><span class="line">&#125;<span class="comment">//test end</span></span><br></pre></td></tr></table></figure>
+
+<p>如果是比较长的lua脚本,减少redis多次读取eval的操作,使用scriptload缓存脚本, 但是要注意每一个节点都要有这个LUA副本</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">boolean</span> <span class="title">unlock</span><span class="params">(String lockKey, String lockVal)</span> </span>&#123;</span><br><span class="line">    List&lt;String&gt; keys = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    keys.add(lockKey);</span><br><span class="line">    List&lt;String&gt; argv = <span class="keyword">new</span> ArrayList&lt;&gt;();</span><br><span class="line">    argv.add(lockVal);</span><br><span class="line">    <span class="keyword">try</span> &#123;</span><br><span class="line">        Object result = jedisCluster.evalsha(unlockSha1, keys, argv);</span><br><span class="line">        <span class="keyword">return</span> UNLOCK_SUCCESS.equals(result);</span><br><span class="line">    &#125;<span class="keyword">catch</span> (JedisNoScriptException e)&#123;</span><br><span class="line">        <span class="comment">//没有脚本缓存时，重新发送脚本并缓存</span></span><br><span class="line">        <span class="comment">//根据lockkey计算slot，在对应redis节点重新缓存一份脚本数据</span></span><br><span class="line">        System.out.println(<span class="string">"try to store script......"</span>);</span><br><span class="line">        storeScript(lockKey);</span><br><span class="line">        <span class="comment">//重试获取</span></span><br><span class="line">        Object result = jedisCluster.evalsha(unlockSha1, keys, argv);</span><br><span class="line">        <span class="keyword">return</span> UNLOCK_SUCCESS.equals(result);</span><br><span class="line">    &#125;<span class="keyword">catch</span> (Exception e)&#123;</span><br><span class="line">        e.printStackTrace();</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">String unlockSha1 = <span class="string">""</span>;</span><br><span class="line"><span class="comment">// https://blog.csdn.net/qq_20597727/article/details/85235602</span></span><br><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">storeScript</span><span class="params">(String slotKey)</span></span>&#123;</span><br><span class="line">    <span class="keyword">if</span> (<span class="string">""</span>.equals(unlockSha1) || !jedisCluster.scriptExists(unlockSha1, slotKey))&#123;</span><br><span class="line">        <span class="comment">//redis支持脚本缓存，返回哈希码，后续可以继续用来调用脚本</span></span><br><span class="line">        unlockSha1 = jedisCluster.scriptLoad(UNLOCK_LUA, slotKey);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>LUA脚本</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> Long UNLOCK_SUCCESS = <span class="number">1L</span>;</span><br><span class="line"><span class="keyword">private</span> <span class="keyword">final</span> String UNLOCK_LUA =</span><br><span class="line"><span class="string">"if"</span> +</span><br><span class="line"><span class="string">" redis.call('get', KEYS[1]) == ARGV[1]"</span> +</span><br><span class="line"><span class="string">" then"</span> +</span><br><span class="line"><span class="string">" return redis.call('del', KEYS[1])"</span> +</span><br><span class="line"><span class="string">" else"</span> +</span><br><span class="line"><span class="string">" return 0"</span> +</span><br><span class="line"><span class="string">" end"</span>;</span><br></pre></td></tr></table></figure>
+
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/07/20/JVM基础笔记/" rel="next" title="JVM基础笔记">
+                  <i class="fa fa-chevron-left"></i> JVM基础笔记
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+                <a href="/2020/08/03/redisCluster/" rel="prev" title="">
+                   <i class="fa fa-chevron-right"></i>
+                </a>
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#linux"><span class="nav-number">1.</span> <span class="nav-text">linux</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#redis集群"><span class="nav-number">2.</span> <span class="nav-text">redis集群</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#集群部署"><span class="nav-number">2.1.</span> <span class="nav-text">集群部署</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#启动server"><span class="nav-number">2.2.</span> <span class="nav-text">启动server</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#连接redis"><span class="nav-number">2.3.</span> <span class="nav-text">连接redis</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看节点"><span class="nav-number">2.4.</span> <span class="nav-text">查看节点</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看key对应的槽"><span class="nav-number">2.5.</span> <span class="nav-text">查看key对应的槽</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#清空数据"><span class="nav-number">2.6.</span> <span class="nav-text">清空数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#查看数据"><span class="nav-number">2.7.</span> <span class="nav-text">查看数据</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#集群限制"><span class="nav-number">2.8.</span> <span class="nav-text">集群限制</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#主-处理业务-从-备份-高可用"><span class="nav-number">2.9.</span> <span class="nav-text">主: 处理业务 从:备份,高可用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#节点的奇偶性"><span class="nav-number">2.10.</span> <span class="nav-text">节点的奇偶性:</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lua脚本"><span class="nav-number">3.</span> <span class="nav-text">lua脚本</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Swen</p>
+  <div class="site-description" itemprop="description">rain drop dida dida ~~~</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Swen</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>

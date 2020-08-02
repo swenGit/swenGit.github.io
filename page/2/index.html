@@ -202,6 +202,187 @@
   
   
   <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/23/linux-java/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Swen">
+      <meta itemprop="description" content="rain drop dida dida ~~~">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lalala~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+            
+            <a href="/2019/10/23/linux-java/" class="post-title-link" itemprop="url">linux-java</a>
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-23 10:35:39" itemprop="dateCreated datePublished" datetime="2019-10-23T10:35:39+08:00">2019-10-23</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-11-06 16:56:15" itemprop="dateModified" datetime="2019-11-06T16:56:15+08:00">2019-11-06</time>
+              </span>
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <p>起因:</p>
+<p>读大量文件并解析,在windows的eclipse运行时间17s,在linux环境运行300s</p>
+<p>彻查了一下原因,记录一下笔记</p>
+<h4 id="linux运行java程序"><a href="#linux运行java程序" class="headerlink" title="linux运行java程序"></a>linux运行java程序</h4><p>首先记录一下命令</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2019/10/23/linux-java/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/22/OAuth2笔记/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Swen">
+      <meta itemprop="description" content="rain drop dida dida ~~~">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lalala~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+            
+            <a href="/2019/10/22/OAuth2笔记/" class="post-title-link" itemprop="url">OAuth2读书笔记</a>
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2019-10-22 06:16:13 / 修改时间：06:16:45" itemprop="dateCreated datePublished" datetime="2019-10-22T06:16:13+08:00">2019-10-22</time>
+            </span>
+          
+            
+
+            
+          
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+          <h3 id="一-简单搭建"><a href="#一-简单搭建" class="headerlink" title="一. 简单搭建"></a>一. 简单搭建</h3><h4 id="1-客户端简单流程"><a href="#1-客户端简单流程" class="headerlink" title="1.客户端简单流程"></a>1.客户端简单流程</h4><ol>
+<li><p>获取code</p>
+<p>客户端上送body</p>
+<figure class="highlight"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    <span class="attr">"response_type"</span> : <span class="string">"code"</span>,</span><br><span class="line">    "client_id" : "103", # 注册在OAuth服务器的</span><br><span class="line">    "redirect_uri" : redirect_uris[0] # 用于重定向,客户端维护一堆uri,自取. 同样也要在OAuth服务器上注册</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>后重定向回来, 地址后拼接?code=123456789</p>
+<blockquote>
+<h5 id="使用state进行跨站保护"><a href="#使用state进行跨站保护" class="headerlink" title="使用state进行跨站保护"></a>使用state进行跨站保护</h5><p>在获取code时多送一个state, state会随着302原样返回, 如果302返回的state和会话中的不一致,说明被CSRF攻击了</p>
+</blockquote></li></ol>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2019/10/22/OAuth2笔记/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+    
+    
+      <footer class="post-footer">
+          <div class="post-eof"></div>
+        
+      </footer>
+  </div>
+  
+  
+  
+  </article>
+
+    
+        <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block home">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/10/14/HashMap构造参数/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -911,7 +1092,7 @@
         
           <a href="/archives/">
         
-          <span class="site-state-item-count">17</span>
+          <span class="site-state-item-count">19</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>

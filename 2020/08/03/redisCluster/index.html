@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+
+
+
+
+
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 3.9.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.4.0">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.4.0">
+  <link rel="mask-icon" href="/images/logo.svg?v=7.4.0" color="#222">
+
+<link rel="stylesheet" href="/css/main.css?v=7.4.0">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Gemini',
+    version: '7.4.0',
+    exturl: false,
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":false,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: '',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    translation: {
+      copy_button: '复制',
+      copy_success: '复制成功',
+      copy_failure: '复制失败'
+    },
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="作者 Yang大大 原文链接:https://juejin.im/post/6844903870666113031 你不知道的Redis：RedisCluster与JedisCluster前言Redis Cluster是Redis官方提供的集群解决方案。由于业务的飞速增长，单机模式总会遇到内存、性能等各种瓶颈，这个时候我们总会喊，上集群啊。就跟我家热得快炸了，你总喊开空调呀一样。的确，上集群可以解">
+<meta property="og:type" content="article">
+<meta property="og:title" content="lalala~">
+<meta property="og:url" content="http://yoursite.com/2020/08/03/redisCluster/index.html">
+<meta property="og:site_name" content="lalala~">
+<meta property="og:description" content="作者 Yang大大 原文链接:https://juejin.im/post/6844903870666113031 你不知道的Redis：RedisCluster与JedisCluster前言Redis Cluster是Redis官方提供的集群解决方案。由于业务的飞速增长，单机模式总会遇到内存、性能等各种瓶颈，这个时候我们总会喊，上集群啊。就跟我家热得快炸了，你总喊开空调呀一样。的确，上集群可以解">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="http://yoursite.com/2020/08/03/redisCluster/16b6b14e83d0186c">
+<meta property="og:image" content="http://yoursite.com/2020/08/03/redisCluster/16b6b14e88c8b8c1">
+<meta property="og:image" content="http://yoursite.com/2020/08/03/redisCluster/16b6b14e882a11b6">
+<meta property="og:image" content="http://yoursite.com/2020/08/03/redisCluster/16b6b14edf5baae3">
+<meta property="og:image" content="http://yoursite.com/2020/08/03/redisCluster/16b6b14efc99433c">
+<meta property="og:image" content="http://yoursite.com/2020/08/03/redisCluster/cluster-init.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/03/redisCluster/1596366417834.png">
+<meta property="og:image" content="http://yoursite.com/2020/08/03/redisCluster/1596366468948.png">
+<meta property="og:updated_time" content="2020-08-02T11:38:28.116Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="lalala~">
+<meta name="twitter:description" content="作者 Yang大大 原文链接:https://juejin.im/post/6844903870666113031 你不知道的Redis：RedisCluster与JedisCluster前言Redis Cluster是Redis官方提供的集群解决方案。由于业务的飞速增长，单机模式总会遇到内存、性能等各种瓶颈，这个时候我们总会喊，上集群啊。就跟我家热得快炸了，你总喊开空调呀一样。的确，上集群可以解">
+<meta name="twitter:image" content="http://yoursite.com/2020/08/03/redisCluster/16b6b14e83d0186c">
+  <link rel="canonical" href="http://yoursite.com/2020/08/03/redisCluster/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title> | lalala~</title>
+  
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?dd1e5524be2b83762eb6a060ff1d5b1a";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-CN">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">lalala~</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+      
+      
+      
+        
+        <li class="menu-item menu-item-home">
+      
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+      
+      
+      
+        
+        <li class="menu-item menu-item-archives">
+      
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+  </ul>
+
+</nav>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+            
+
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+      <article itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block post">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2020/08/03/redisCluster/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="Swen">
+      <meta itemprop="description" content="rain drop dida dida ~~~">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="lalala~">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+
+          
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              
+                
+              
+
+              <time title="创建时间：2020-08-03 00:20:30" itemprop="dateCreated datePublished" datetime="2020-08-03T00:20:30+08:00">2020-08-03</time>
+            </span>
+          
+            
+
+            
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-08-02 19:38:28" itemprop="dateModified" datetime="2020-08-02T19:38:28+08:00">2020-08-02</time>
+              </span>
+            
+          
+
+          
+            <span class="post-meta-item" title="阅读次数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p>作者 Yang大大</p>
+<p>原文链接:<a href="https://juejin.im/post/6844903870666113031" target="_blank" rel="noopener">https://juejin.im/post/6844903870666113031</a></p>
+<h1 id="你不知道的Redis：RedisCluster与JedisCluster"><a href="#你不知道的Redis：RedisCluster与JedisCluster" class="headerlink" title="你不知道的Redis：RedisCluster与JedisCluster"></a>你不知道的Redis：RedisCluster与JedisCluster</h1><h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>Redis Cluster是Redis官方提供的集群解决方案。由于业务的飞速增长，单机模式总会遇到内存、性能等各种瓶颈，这个时候我们总会喊，上集群啊。就跟我家热得快炸了，你总喊开空调呀一样。的确，上集群可以解决大多数问题，但是在使用集群的过程中，不可避免会遇到这样那样的问题，这个时候怎么办呢，各种百度各种群里去问吗？NO,作为开发人员，在享受第三方提供的方便前，有必要去了解其基本的工作机制，这样才能在遇到问题时快速定位，方便下手。本篇文章主要是梳理Redis集群的原理和Java客户端JedisCluster的工作流程及源码分析，虽万字长文，但原理通俗易懂，源码条理清晰。</p>
+<h1 id="一、RedisCluster"><a href="#一、RedisCluster" class="headerlink" title="一、RedisCluster"></a>一、RedisCluster</h1><p>有关redis集群的基本介绍及搭建教程请移步：<a href="http://www.redis.cn/topics/cluster-tutorial.html" target="_blank" rel="noopener">Redis 集群教程</a></p>
+<h2 id="1-1-数据如何读写"><a href="#1-1-数据如何读写" class="headerlink" title="1.1 数据如何读写"></a>1.1 数据如何读写</h2><p>在单个的 redis节点中，我们都知道redis把数据已 k-v 结构存储在内存中，使得 redis 对数据的读写非常之快。Redis Cluster 是去中心化的，它将所有数据分区存储。也就是说当多个 Redis 节点搭建成集群后，每个节点只负责自己应该管理的那部分数据，相互之间存储的数据是不同的。</p>
+<p>Redis Cluster 将全部的键空间划分为16384块，每一块空间称之为槽（slot），又将这些槽及槽所对应的 k-v 划分给集群中的每个主节点负责。如下图：</p>
+<p><img src="/2020/08/03/redisCluster/16b6b14e83d0186c" alt="槽位分布图"></p>
+<p>key -&gt; slot 的算法选择上，Redis Cluster 选择的算法是 hash(key) mod 16384，即使用CRC16算法对key进行hash，然后再对16384取模，结果便是对应的slot。</p>
+<blockquote>
+<p>常见的数据分区方法：</p>
+<ul>
+<li>节点取余分区：对特定数据取hash值再对节点数取余来决定映射到哪一个节点。优点是简单，缺点是扩容或收缩时需重新计算映射结果，极端情况下会导致数据全量迁移。</li>
+<li>一致性哈希分区：给每个节点分配一个0～2^32的token，使其构成一个环，数据命中规则为根据key的hash值，顺时针找到第一个token大于等于该hash的节点。优点是加减节点只影响相邻的节点，缺点是节点少的时候优点变缺点，反倒会影响环中大部分数据，同时加减节点时候会导致部分数据无法命中。</li>
+<li>虚拟槽分区：使用分散度良好的hash函数将数据映射到一个固定范围的整数集合，这些整数便是槽位，再分给具体的节点管理。Redis Cluster使用的便是虚拟槽分区。</li>
+</ul>
+</blockquote>
+<p>上面主要介绍了下集群中数据是如何分布在各节点上的，但实际上<strong>客户端是如何读写数据</strong>的呢？<strong>Redis Cluster 采用了直接节点的方式</strong>。集群模式下，客户端去操作集群是直连到一个具体的节点上操作的。当该节点接收到任何键操作命令时，会先计算键对应的slot，然后根据slot找出对应节点（这里如何找后面会提到），如果对应的节点是自身，则执行键操作命令，返回结果；如果不是自身，会返回给客户端MOVED重定向错误，告诉客户端应该请求具体哪个节点，由客户端发起二次请求到正确的节点，完成本次键操作。MOVED错误信息如下图所示：</p>
+<p><img src="/2020/08/03/redisCluster/16b6b14e88c8b8c1" alt="MOVED错误信息"></p>
+<blockquote>
+<p>当使用redis-cli 直连集群中节点时，使用 -c 参数，redis-cli会自动重定向连接到目标节点进行键操作。需要注意的是，这个自动重定向功能是redis-cli实现的，跟redis节点本身无关，节点本身依旧返回了MOVED错误给客户端。</p>
+</blockquote>
+<p>在键操作命令中，除了对单个键值的操作，还有<strong>多键值以及批量操作</strong>。Redis 集群实现了所有在非分布式版本中出现的处理单一键值的命令，但是在使用<strong>多个键值的操作</strong>，由于集群跟客户端的通信方式是直连节点，对于多键的操作却是需要遍历所有节点，因此是<strong>不支持</strong>的，一般由客户端在代码中实现需要的功能。<strong>对于批量操作</strong>，一方面可以由客户端代码计算槽位，针对单个节点进行分档，最后批量操作，另一方面，Redis Cluster 提供了<strong>hashtag</strong> 的功能，通过为key打上hashtag，让一类key在存储时就位于同一个slot，达到存储于同一个节点的效果。</p>
+<blockquote>
+<p>hashtag: 是Cluster为了满足用户让特定Key绑定到特定槽位的需求而实现的一个功能。在计算key的slot时，如果key中包括花括号{}，并且花括号中内容不为空，便会计算花括号中标志对应的slot。如果不包括{}或是其中内容为空，则计算整个key对应的slot。可以利用这个功能，在特定需求中将一类key绑定到一个槽位上，但不可滥用，毕竟本身数据是分区存的，全这么搞会导致各节点内存占用不平衡，影响集群性能。</p>
+</blockquote>
+<p>注意：lua脚本执行、事务中key操作，前提都是所涉及的key在一个节点上，如果在使用集群时无法避免这些操作，可以考虑使用hashtag，然后客户端通过这台节点的连接去操作。</p>
+<h2 id="1-2-节点间的信息共享"><a href="#1-2-节点间的信息共享" class="headerlink" title="1.2 节点间的信息共享"></a>1.2 节点间的信息共享</h2><p>集群中会有多个节点，每个节点负责一部分slot以及对应的k-v数据，并且通过直连具体节点的方式与客户端通信。那么问题来了，你向我这里请求一个key的value，这个key对应的slot并不归我负责，但我又要需要告诉你MOVED到目标节点，我如何知道这个目标节点是谁呢？</p>
+<p>Redis Cluster使用Gossip协议维护节点的元数据信息，这种协议是P2P模式的，主要指责就是信息交换。节点间不停地去交换彼此的元数据信息，那么总会在一段时间后，大家都知道彼此是谁，负责哪些数据，是否正常工作等等。节点间信息交换是依赖于彼此发出的Gossip消息的。常用的一般是以下四种消息：</p>
+<ul>
+<li><strong>meet消息</strong> 会通知接收该消息的节点，发送节点要加入当前集群，接收者进行响应。</li>
+<li><strong>ping消息</strong> 是集群中的节点定期向集群中其他节点（部分或全部）发送的连接检测以及信息交换请求，消息包含发送节点信息以及发送节点知道的其他节点信息。</li>
+<li><strong>pong消息</strong>是在节点接收到meet、ping消息后回复给发送节点的响应消息，告诉发送方本次通信正常，消息包含当前节点状态。</li>
+<li><strong>fail消息</strong> 是在节点认为集群内另外某一节点下线后向集群内所有节点广播的消息。</li>
+</ul>
+<p>在集群启动的过程中，有一个重要的步骤是<strong>节点握手</strong>，其本质就是在一个节点上向其他所有节点发送meet消息，消息中包含当前节点的信息（节点id，负责槽位，节点标识等等），接收方会将发送节点信息存储至本地的节点列表中。消息体中还会包含与发送节点通信的其他节点信息（节点标识、节点id、节点ip、port等）,接收方也会解析这部分内容，如果本地节点列表中不存在，则会主动向新节点发送meet消息。接收方处理完消息后，也会回复pong消息给发送者节点，发送者也会解析pong消息更新本地存储节点信息。因此，虽然只是在一个节点向其他所有节点发送meet消息，最后所有节点都会有其他所有节点的信息。</p>
+<p>集群启动后，集群中各节点也会定时往<strong>其他部分节点</strong>发送ping消息，用来检测目标节点是否正常以及发送自己最新的节点负槽位信息。接收方同样响应pong消息，由发送方更新本地节点信息。当在与某一节点通信失败（故障发现策略后面会说）时，则会主动向集群内节点广播fail消息。考虑到频繁地交换信息会加重带宽（集群节点越多越明显）和计算的负担，Redis Cluster内部的定时任务每秒执行10次，每次遍历本地节点列表，对最近一次接受到pong消息时间大于cluster_node_timeout/2的节点立马发送ping消息，此外每秒随机找5个节点，选里面最久没有通信的节点发送ping消息。同时 ping 消息的消息投携带自身节点信息，消息体只会携带1/10的其他节点信息，避免消息过大导致通信成本过高。</p>
+<blockquote>
+<p>cluster_node_timeout 参数影响发送消息的节点数量，调整要综合考虑故障转移、槽信息更新、新节点发现速度等方面。一般带宽资源特别紧张时，可以适当调大一点这个参数，降低通信成本。</p>
+</blockquote>
+<h2 id="1-3-槽位迁移与集群伸缩"><a href="#1-3-槽位迁移与集群伸缩" class="headerlink" title="1.3 槽位迁移与集群伸缩"></a>1.3 槽位迁移与集群伸缩</h2><p>Redis Cluster 支持在集群正常服务过程中，下线或是新增集群节点。但无论是集群扩容还是收缩，本质上都是槽及其对应数据在不同节点上的迁移。一般情况下，槽迁移完成后，每个节点负责的槽数量基本上差不多，保证数据分布满足理论上的均匀。</p>
+<p>常用的有关槽的命令如下：</p>
+<ul>
+<li>CLUSTER ADDSLOTS slot1 [slot2]…[slotN] —— 为当前节点分配要负责的槽，一般用于集群创建过程。</li>
+<li>CLUSTER DELSLOTS slot1 [slot2]…[slotN] —— 将特定槽从当前节点的责任区移除，和ADDSLOTS命令一样，执行成功后会通过节点间通信将最新的槽位信息向集群内其他节点传播。</li>
+<li>CLUSTER SETSLOT slotNum NODE nodeId —— 给指定ID的节点指派槽，一般迁移完成后在各主节点上执行，告知各主节点迁移完成。</li>
+<li>CLUSTER SETSLOT slotNum IMPORTING sourceNodeId —— 在槽迁移的目标节点上执行该命令，意思是这个槽将由原节点迁移至当前节点，迁移过程中，当前节点（即目标节点）只会接收asking命令连接后的被设为IMPORTING状态的slot的命令。</li>
+<li>CLUSTER SETSLOT slotNum MIGRATING targetNodeId —— 在槽迁移的原节点上执行该命令，意思是这个槽将由当前节点迁移至目标节点，迁移过程中，当前节点（即原节点）依旧会接受设为MIGRATING的slot相关的请求，若具体的key依旧存在于当前节点，则处理返回结果，若不在，则返回一个带有目标节点信息的ASK重定向错误。<strong>其他节点在接受到该槽的相关请求时，依旧会返回到原节点的MOVED重定向异常。</strong></li>
+</ul>
+<p>实际上迁移槽的核心是将槽对应的k-v数据迁移到目标节点。所以在完成slot在原节点和目标节点上状态设置（即上面最后两条命令）后，就要开始进行具体key的迁移。</p>
+<ul>
+<li>CLUSTER GETKEYSINSLOT slot total —— 该命令返回指定槽指定个数的key集合</li>
+<li>MIGRATE targetNodeIp targetNodePort key dbId timeout [auth password] —— 该命令在原节点执行，会连接到目标节点，将key及其value序列化后发送过去，在收到目标节点返回的ok后，删除当前节点上存储的key。整个操作是原子性的。由于集群模式下使用各节点的0号db，所以迁移时dbId这个参数只能是0。</li>
+<li>MIGRATE targetNodeIp targetNodePort “” 0 timeout [auth password] keys key1 key2… —— 该命令是上面迁移命令基于pipeline的批量版本。</li>
+</ul>
+<p>在整个slot的key迁移完成后，需要在各主节点分别执行CLUSTER SETSLOT slotNum NODE nodeId来通知整个slot迁移完成。redis-trib.rb 提供的reshard功能便是基于官方提供的上述命令实现的。</p>
+<p>集群的扩展过程实际上就是启动一个新节点，加入集群（通过gossip协议进行节点握手、通信），最后从之前各节点上迁移部分slot到新节点上。</p>
+<p>集群的收缩过程除了除了将待下线节点的槽均匀迁移到其他主节点之外，还有对节点的下线操作。官方提供了CLUSTER FORGET downNodeId命令，用于在其他节点上执行以忘记下线节点，不与其交换信息，需要注意的是该命令有效期为60s，超过时间后会恢复通信。一般建议使用redis-trib.rb 提供的del-node功能。</p>
+<h2 id="1-4-高可用"><a href="#1-4-高可用" class="headerlink" title="1.4 高可用"></a>1.4 高可用</h2><p>Redis集群牺牲了数据强一致性原则，追求最大的性能。上文中一直未提到从节点，主要都是从主节点出发去梳理数据存储、集群伸缩的一些原理。要保证高可用的前提是离不开从节点的，一旦某个主节点因为某种原因不可用后，就需要一个一直默默当备胎的从节点顶上来了。一般在集群搭建时最少都需要6个实例，其中3个实例做主节点，各自负责一部分槽位，另外3个实例各自对应一个主节点做其从节点，对主节点的操作进行复制（本文对于主从复制的细节不进行详细说明）。Redis Cluster在给主节点添加从节点时，不支持slaveof命令，而是通过在从节点上执行命令cluster replicate masterNodeId 。完整的redis集群架构图如下：</p>
+<p><img src="/2020/08/03/redisCluster/16b6b14e882a11b6" alt="图片"></p>
+<p>Cluster的故障发现也是基于节点通信的。每个节点在本地存储有一个节点列表（其他节点信息），列表中每个<strong>节点元素除了存储其ID、ip、port、状态标识（主从角色、是否下线等等）外，还有最后一次向该节点发送ping消息的时间、最后一次接收到该节点的pong消息的时间以及一个保存其他节点对该节点下线传播的报告链表</strong>。节点与节点间会定时发送ping消息，彼此响应pong消息，成功后都会更新这个时间。同时每个节点都有定时任务扫描本地节点列表里这两个消息时间，若发现pong响应时间减去ping发送时间超过cluster-node-timeout配置时间（默认15秒,该参数用来设置节点间通信的超时时间）后，便会将本地列表中对应节点的状态标识为PFAIL，认为其有可能下线。</p>
+<p>节点间通信（ping）时会携带本地节点列表中部分节点信息，如果其中包括标记为PFAIL的节点，那么在消息接收方解析到该节点时，会找自己本地的节点列表中该节点元素的下线报告链表，看是否已经存在发送节点对于该故障节点的报告，如果有，就更新接收到发送ping消息节点对于故障节点的报告的时间，如果没有，则将本次报告添加进链表。<strong>下线报告链表的每个元素结构只有两部分内容，一个是报告本地这个故障节点的发送节点信息，一个是本地接收到该报告的时间</strong>（存储该时间是因为故障报告是有有效期的，避免误报）<strong>。由于每个节点的下线报告链表都存在于各自的信息结构中，所以在浏览本地节点列表中每个节点元素时，可以清晰地知道，有其他哪些节点跟我说，兄弟，你正在看的这个节点我觉的凉凉了。</strong></p>
+<blockquote>
+<p>故障报告的有效期是 cluster-node-timeout * 2</p>
+</blockquote>
+<p>消息接收方解析到PFAIL节点，并且更新本地列表中对应节点的故障报告链表后，会去查看该节点的故障报告链表中有效的报告节点是否超过所有主节点数的一半。如果没超过，便继续解析ping消息；如果超过，代表<strong>超过半数的节点认为这个节点可能下线了，当前节点就会将PFAIL节点本地的节点信息中的状态标识标记为FAIL</strong>,然后向集群内广播一条fail消息，集群内的所有节点接收到该fail消息后，会把各自本地节点列表中该节点的状态标识修改为FAIL。在所有节点对其标记未FAIL后，该FAIL节点对应的从节点就会发起转正流程。在转正流程完成后，这个节点就会正式下线，等到其恢复后，发现自己的槽已经被分给某个节点，便会将自己转换成这个节点的从节点并且ping集群内其他节点，其他节点接到恢复节点的ping消息后，便会更新其状态标识。此外，恢复的节点若发现自己的槽还是由自己负责，就会跟其他节点通信，其他主节点发现该节点恢复后，就会拒绝其从节点的选举，最终清除自己的FAIL状态。</p>
+<h2 id="1-5-从节点坎坷晋升路"><a href="#1-5-从节点坎坷晋升路" class="headerlink" title="1.5 从节点坎坷晋升路"></a>1.5 从节点坎坷晋升路</h2><p>在集群中若是某个主节点发生故障，被其他主节点标价为FAIL状态，为了集群的正常使用，这时会由其对应的从节点中晋升一个为新的主节点，负责原主节点的一切工作。</p>
+<p>并不是所有从节点都有被提名的资格，这个跟普通职员的晋升一样。只有从节点与主节点的连接断线不超过一定时间，才会初步具备被提名的资格。该时间一般为cluster-node-timeout *10，10是从节点的默认有效因子。</p>
+<p>一般来说，故障主节点会有多个符合晋升要求的从节点，那么怎么从这些从节点中选出一个最合适的来晋升为主节点恢复工作呢？从节点的作用是作为主节点的备份，每个对于主节点的操作都会异步在多个从节点上备份，但受具体的主从节点结构决定，一般每个从节点对于主节点的通不程度是不同的。<strong>为了能更好的替代原主节点工作，就必须从这些从节点中选举一个最接近甚至完全同步主节点数据的从节点来完成最终晋升</strong>。</p>
+<p>从节点晋升的发起点是从节点。从节点在定时任务中与其他节点通信，当发现主节点FAIL后，会判断资深是否有晋升提名资格。如果有的话，则会根据相关规则设置一个选举自己的时间。在到达那个设置的时间点后，再发起针对自己晋升的选举流程，选票则由集群中其他正常主节点选投。若自己获得的选票超过正常主节点数的一半时，则会执行替换原主节点工作，完成本次选举晋升。</p>
+<blockquote>
+<p><strong>设置选举时间规则</strong>：发现主节点FAIL后并不会立马发起选举。而是经过 固定延时（500ms）+ 随机延时（0-500ms）+ 从节点复制偏移量排名<em>1000ms 后发起针对自己的选举流程。其中 固定延时 是保证主节点的FAIL状态被所有主节点获知，随机延时是为了尽量避免发生多个从节点同时发起选举的情况，最后的排名</em>1000ms是为了保证复制偏移量最大也就是最接近于原主节点数据的从节点最先发起选举。因此一般来说，从节点晋升选举一次就会成功。<strong>主节点是没有区分哪个从节点是最适合晋升的规则的，主要靠这里的选举发起时间来让最合适的一次成功。</strong></p>
+</blockquote>
+<p><strong>从节点发起选举主要分为两步</strong>：</p>
+<ul>
+<li>自增集群的全局配置纪元，并更新为当前节点的epoch（配置纪元这里不详细介绍，不懂的可以先简单理解为版本号，每个节点都有自己的epoch并且集群有一个全局的epoch）;</li>
+<li>向集群内广播选举消息FAILOVER_AUTH_REQUEST，消息内会包含当前节点的epoch。</li>
+</ul>
+<p>从节点广播选举消息后，在NODE_TIMEOUT*2时间内等待主节点的响应FAILOVER_AUTH_ACK。若收到大多数主节点的响应，代表选举成功，则会通过ping\pong消息来宣誓主权。若未收到足够响应则会中断本次选举，由其他节点重新发起选举。</p>
+<p>主节点在每个全局配置纪元中有且只有一张选票，一旦投给某个从节点便会忽视其他节点的选举消息。一般同一个配置纪元多个从节点竞争的情况只有极小概率会发生，这是由从节点的选举时间以及选举步骤决定的。主节点的投票响应FAILOVER_AUTH_ACK消息中会返回接收到的选举消息一样的epoch，从节点也只会认可跟节点当前epoch一致的投票响应，这样可以避免因为网络延迟等因素导致认可迟来的历史认可消息。</p>
+<p>从节点成功晋升后，在替换原主节点时，还需要进行最后三步：</p>
+<ul>
+<li>取消当前节点的复制工作，变身为主节点；</li>
+<li>撤销原主节点负责的槽，并把这些槽委派给自己；</li>
+<li>广播pong消息，通知所有节点自己已经完成转正以及转正后负责的槽信息。</li>
+</ul>
+<h1 id="二、JedisCluster"><a href="#二、JedisCluster" class="headerlink" title="二、JedisCluster"></a>二、JedisCluster</h1><p>Jedis是redis的java客户端，JedisCluster则是Jedis根据Redis集群的特性提供的集群客户端。上文介绍过了redis集群下操作key的详细流程，一般通过redis-cli启动客户端连接具体的节点时，要操作的key若不在这个节点上时，服务端会返回MOVED重定向错误，这时需要手动连接至重定向节点才能继续操作。或者redis-cli连接服务节点时加上-c 参数，就可以使用redis-cli提供的自动重定向机制，在操作其他服务节点的key时会进行自动重定向，避免客户端手动重定向。JedisCluster作为操作Redis集群的java客户端，同样遵守RedisCluster提供的客户端连接规范，本节从源码的角度去看其具体是怎么做的。</p>
+<h2 id="2-1-初始化工作"><a href="#2-1-初始化工作" class="headerlink" title="2.1 初始化工作"></a>2.1 初始化工作</h2><p>无论你使用spring集成jedis或是直接使用jedis，第一步都是客户端的初始化工作，这里直接从JedisCluster着手去看。JedisCluster实际上是一个高级客户端，它继承了BinaryJedisCluster，客户端的初始化工作实际上都是由该类负责，此外还实现了JedisCommands、MultiKeyJedisClusterCommands和JedisClusterScriptingCommands三个接口，封装了单键命令、多键操作命令以及脚本执行命令等具体的方法供开发人员调用。</p>
+<p><img src="/2020/08/03/redisCluster/16b6b14edf5baae3" alt="图片"></p>
+<p>JedisCluster的构造器有很多，但最终都是调用了父类BinaryJedisCluster的构造，实际上这里是初始化了一个连接处理器，并且设置了最大重试次数。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public BinaryJedisCluster(Set&lt;HostAndPort&gt; jedisClusterNode, </span><br><span class="line">int connectionTimeout, int soTimeout, int maxAttempts, </span><br><span class="line">String password, GenericObjectPoolConfig poolConfig) &#123;</span><br><span class="line"></span><br><span class="line">  this.connectionHandler = new JedisSlotBasedConnectionHandler(jedisClusterNode, poolConfig,</span><br><span class="line">          connectionTimeout, soTimeout, password);</span><br><span class="line">  this.maxAttempts = maxAttempts;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>JedisSlotBasedConnectionHandler实际上又调用了父类JedisClusterConnectionHandler 的构造器，而这里才是JedisCluster初始化的核心。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public JedisClusterConnectionHandler(Set&lt;HostAndPort&gt; nodes,</span><br><span class="line">                                     final GenericObjectPoolConfig poolConfig, int connectionTimeout, int soTimeout, String password) &#123;</span><br><span class="line">  </span><br><span class="line">  // 创建集群信息的缓存对象</span><br><span class="line">  this.cache = new JedisClusterInfoCache(poolConfig, connectionTimeout, soTimeout, password);</span><br><span class="line"></span><br><span class="line">  // 初始化连接池与缓存信息</span><br><span class="line">  initializeSlotsCache(nodes, poolConfig, password);</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>创建<strong>JedisClusterInfoCache</strong> 实例的时候看其构造可以知道只是将连接配置信息赋值给实例属性，并无其他操作。那么它究竟缓存了哪些信息呢？查看其源码可以发现如下两个重要的属性，<strong>分别存放了节点与其对应连接池的映射关系和槽位与槽位所在节点对应连接池的映射。</strong></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">JedisClusterInfoCache.java</span><br><span class="line"></span><br><span class="line">private final Map&lt;String, JedisPool&gt; nodes = new HashMap&lt;String, JedisPool&gt;();</span><br><span class="line">private final Map&lt;Integer, JedisPool&gt; slots = new HashMap&lt;Integer, JedisPool&gt;()；</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>初始化缓存数据则是通过遍历所有节点，创建每个节点的jedis实例，依次连接获取节点及负责槽位数据。一般来说，是根据配置中第一个节点连接后获取相关信息就会跳出遍历。initializeSlotsCache方法代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">JedisClusterConnectionHandler.java</span><br><span class="line"></span><br><span class="line">private void initializeSlotsCache(Set&lt;HostAndPort&gt; startNodes, GenericObjectPoolConfig poolConfig, String password) &#123;</span><br><span class="line">  for (HostAndPort hostAndPort : startNodes) &#123;</span><br><span class="line">    Jedis jedis = new Jedis(hostAndPort.getHost(), hostAndPort.getPort());</span><br><span class="line">    if (password != null) &#123;</span><br><span class="line">      jedis.auth(password);</span><br><span class="line">    &#125;</span><br><span class="line">    try &#123;</span><br><span class="line">      // 获取节点及所负责的槽位信息</span><br><span class="line">      cache.discoverClusterNodesAndSlots(jedis);</span><br><span class="line">      break;</span><br><span class="line">    &#125; catch (JedisConnectionException e) &#123;</span><br><span class="line">      // try next nodes</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">      if (jedis != null) &#123;</span><br><span class="line">        jedis.close();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>关于缓存数据的获取及更新实际是由JedisClusterInfoCache的discoverClusterNodesAndSlots方法实现，<strong>主要是通过cluster slots 命令获取集群内的槽位分布数据，然后解析该命令的返回结果，为每个主节点初始化一个连接池，然后将节点与连接池、节点负责的所有槽位与连接池的映射关系缓存到上面说的两个map中</strong>。源码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">JedisClusterInfoCache.java</span><br><span class="line"></span><br><span class="line">private final ReentrantReadWriteLock rwl = new ReentrantReadWriteLock();</span><br><span class="line">// 使用读写锁控制缓存更新时的线程安全</span><br><span class="line">private final Lock r = rwl.readLock();</span><br><span class="line">private final Lock w = rwl.writeLock();</span><br><span class="line">// cluster slots 命令返回结果的每个元素中第三部分为主节点信息，后面的都是从节点信息</span><br><span class="line">private static final int MASTER_NODE_INDEX = 2;</span><br><span class="line"></span><br><span class="line">public void discoverClusterNodesAndSlots(Jedis jedis) &#123;</span><br><span class="line">  w.lock();</span><br><span class="line">  try &#123;</span><br><span class="line">    reset();   // 销毁连接池、清空缓存</span><br><span class="line">    // 根据cluster slots 命令获取槽位分布信息</span><br><span class="line">    List&lt;Object&gt; slots = jedis.clusterSlots();</span><br><span class="line">    </span><br><span class="line">    for (Object slotInfoObj : slots) &#123;</span><br><span class="line">      List&lt;Object&gt; slotInfo = (List&lt;Object&gt;) slotInfoObj;</span><br><span class="line"></span><br><span class="line">      if (slotInfo.size() &lt;= MASTER_NODE_INDEX) &#123;</span><br><span class="line">        continue;</span><br><span class="line">      &#125;</span><br><span class="line">      // 获取当前槽位节点负责的所有槽位</span><br><span class="line">      List&lt;Integer&gt; slotNums = getAssignedSlotArray(slotInfo);</span><br><span class="line"></span><br><span class="line">      // hostInfos</span><br><span class="line">      int size = slotInfo.size();</span><br><span class="line">      for (int i = MASTER_NODE_INDEX; i &lt; size; i++) &#123;</span><br><span class="line">        // 获取节点信息数据</span><br><span class="line">        List&lt;Object&gt; hostInfos = (List&lt;Object&gt;) slotInfo.get(i);</span><br><span class="line">        if (hostInfos.size() &lt;= 0) &#123;</span><br><span class="line">          continue;</span><br><span class="line">        &#125;</span><br><span class="line">        // 生成节点对象</span><br><span class="line">        HostAndPort targetNode = generateHostAndPort(hostInfos);</span><br><span class="line">        // 初始化节点连接池，并将节点与其连接池缓存</span><br><span class="line">        setupNodeIfNotExist(targetNode);</span><br><span class="line">        if (i == MASTER_NODE_INDEX) &#123;</span><br><span class="line">           // 若节点是主节点，则将其负责的每个槽位与其连接池建立映射关系缓存</span><br><span class="line">          assignSlotsToNode(slotNums, targetNode);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; finally &#123;</span><br><span class="line">    w.unlock();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>上面discoverClusterNodesAndSlots方法主要是解析cluster slots命令的返回结果，这块不熟悉的话建议连接到集群中的一个节点执行下该命令，对照着结果来看就会很明白。回过头来看，这里的初始化主要分为一下几部分：</p>
+<ul>
+<li>连接一个节点执行cluster slots命令，获取槽位分布以及集群节点信息；</li>
+<li>为每一个节点都初始化一个连接池，并跟节点建立映射关系缓存；</li>
+<li>将每个主节点负责的槽位一一与主节点连接池建立映射缓存。</li>
+</ul>
+<p>初始化工作中缓存的映射信息，在JedisCluster的使用过程中起到了至关重要的作用。但也正是因为JedisCluster在本地内存中缓存节点数据并且为每个节点维护一个连接池，在使用节点特别多的庞大集群时，客户端也会消耗更多内存。</p>
+<h2 id="2-2-键操作详解"><a href="#2-2-键操作详解" class="headerlink" title="2.2 键操作详解"></a>2.2 键操作详解</h2><p>JedisCluster实现了JedisCommands接口封装的单key命令，这里分析单键操作命令的详细流程以set为例，其代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">JedisCluster.java</span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line">public String set(final String key, final String value) &#123;</span><br><span class="line">  return new JedisClusterCommand&lt;String&gt;(connectionHandler, maxAttempts) &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public String execute(Jedis connection) &#123;</span><br><span class="line">      return connection.set(key, value);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;.run(key);</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>通过代码可以看出，实际的set操作还是依赖于jedis。上文在初始化部分提到，会为集群的每个节点都创建一个jedisPool，同时初始化时创建的connectionHandler在这里被JedisClusterCommand的实现类所使用，那么不难理解，<strong>connectionHandler根据JedisClusterInfoCache的缓存数据，对外提供连接获取服务</strong>。要么你给我个节点，我给你个jedis实例，要么你给我个slot，我给你一个jedis实例。这点去看JedisClusterConnectionHand-ler的源码便可以得到证明。因此，JedisClusterCommand在操作key时一定会处理相关信息，得到获取连接的必要参数。下面便是run(key)方法的实现（代码略长，但是逻辑清晰，注释详细）：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br></pre></td><td class="code"><pre><span class="line">JedisClusterCommand.java</span><br><span class="line">// 存放当前操作的ask重定向后的连接</span><br><span class="line">private ThreadLocal&lt;Jedis&gt; askConnection = new ThreadLocal&lt;Jedis&gt;();</span><br><span class="line"></span><br><span class="line">public T run(String key) &#123;</span><br><span class="line">  if (key == null) &#123;</span><br><span class="line">    throw new JedisClusterException(&quot;No way to dispatch this command to Redis Cluster.&quot;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  return runWithRetries(SafeEncoder.encode(key), this.maxAttempts, false, false);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">private T runWithRetries(byte[] key, int attempts, boolean tryRandomNode, boolean asking) &#123;</span><br><span class="line">  if (attempts &lt;= 0) &#123;</span><br><span class="line">    throw new JedisClusterMaxRedirectionsException(&quot;Too many Cluster redirections?&quot;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Jedis connection = null;</span><br><span class="line">  try &#123;</span><br><span class="line">    if (asking) &#123;</span><br><span class="line">      // 若是ask重定向操作，则从ThreadLocal中获取重定向后的jedis</span><br><span class="line">      connection = askConnection.get();</span><br><span class="line">      connection.asking();</span><br><span class="line">      asking = false;    // 若ask重定向成功，撤销ask重定向标记</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      if (tryRandomNode) &#123;  // 随机连接至某个ping-pong正常的节点</span><br><span class="line">        connection = connectionHandler.getConnection();</span><br><span class="line">      &#125; else &#123;</span><br><span class="line">        connection = connectionHandler.getConnectionFromSlot(JedisClusterCRC16.getSlot(key));    // 根据槽位算法计算key对应的slot，再根据slot获取对应节点的jedis</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    return execute(connection);</span><br><span class="line"></span><br><span class="line">  &#125; catch (JedisNoReachableClusterNodeException jnrcne) &#123;</span><br><span class="line">    throw jnrcne;</span><br><span class="line">  &#125; catch (JedisConnectionException jce) &#123;</span><br><span class="line">    // 发生连接异常时，释放连接，开始递归重试</span><br><span class="line">    releaseConnection(connection);</span><br><span class="line">    connection = null;</span><br><span class="line"></span><br><span class="line">    if (attempts &lt;= 1) &#123;</span><br><span class="line">      // 重试次数递减到1次时，代表目标节点可能发生故障，更新缓存数据，抛出原始异常</span><br><span class="line">      this.connectionHandler.renewSlotCache();</span><br><span class="line">      throw jce;</span><br><span class="line">    &#125;</span><br><span class="line">    // 递减重试次数开始重试</span><br><span class="line">    return runWithRetries(key, attempts - 1, tryRandomNode, asking);</span><br><span class="line">    </span><br><span class="line">  &#125; catch (JedisRedirectionException jre) &#123;   // 发生了重定向异常</span><br><span class="line">    // 释放当前占用连接</span><br><span class="line">    releaseConnection(connection);</span><br><span class="line">    connection = null;</span><br><span class="line"></span><br><span class="line">    if (jre instanceof JedisAskDataException) &#123;</span><br><span class="line">      // ASK重定向代表当前槽位正在迁移，直接获取ask异常信息里的目标节点的jedis实例放入ThreadLocal，设置asking标志，重试请求目标节点操作</span><br><span class="line">      asking = true;     </span><br><span class="line">      askConnection.set(this.connectionHandler</span><br><span class="line">              .getConnectionFromNode(jre.getTargetNode()));</span><br><span class="line">              </span><br><span class="line">    &#125; else if (jre instanceof JedisMovedDataException) &#123;</span><br><span class="line">      // MOVED重定向代表本地缓存的槽位数据跟集群不一致，需要更新缓存数据后重试</span><br><span class="line">      this.connectionHandler.renewSlotCache(connection);</span><br><span class="line">      </span><br><span class="line">    &#125; else &#123;</span><br><span class="line">      throw new JedisClusterException(jre);</span><br><span class="line">    &#125;</span><br><span class="line">    return runWithRetries(key, attempts - 1, false, asking); // 重试</span><br><span class="line">  &#125; finally &#123;</span><br><span class="line">    releaseConnection(connection);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>看完上述代码，我们不难梳理出<strong>JedisCluster对键操作的基本流程</strong>。<strong>计算key的slot -》 从缓存中根据slot拿到目标节点的jedis -》 执行键操作</strong>。在这个过程中，如果发生连接异常，则会重试配置的最大重试次数-1次，若连接依旧存在问题，则更新缓存信息，抛出连接的原始异常；如果发生重定向异常，再根据具体的重定向异常做不同处理。<strong>接收到MOVED重定向时会去更新缓存</strong>，然后重试。而<strong>接收到ASK重定向</strong>时是直接解析目标节点并获取一个连接，然后重试走ask分支，<strong>并不更新缓存</strong>。这是因为发生ASK重定向异常时，slot正在迁移，并未完成，该slot的一部分key在目标节点，一部分又在原节点，无法准确地将slot与某个节点绑定，所以不会更新缓存，等到迁移结束后，用旧的缓存去请求key时，这时就会接收到redis返回的MOVED重定向异常，那会才会更新缓存，维持缓存数据的准确性。</p>
+<p>发生连接异常时，先重试max-1次再更新缓存。一方面避免因网络、读写阻塞等原因误判节点故障，中断请求；另一方面避免频繁更新缓存，为保证缓存数据在多线程场景下的线程安全，采用了读写锁控制缓存的读取及更新，频繁更新势必导致大多数读请求被阻塞，影响性能。connectionHandler的renewSlotCache方法内部都是调用了JedisClusterInfoCache的renewClusterSlots(Jedis jedis)方法。不同的是无参时传递的jedis实例为null。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line">JedisClusterInfoCache.java</span><br><span class="line"></span><br><span class="line">public void renewClusterSlots(Jedis jedis) &#123;</span><br><span class="line">  //该变量默认false，当需要更新集群缓存信息时，若有一个线程获得写锁，便会设置该标志为true，这样在更新期间，其他线程便不需要阻塞等待写锁，直接返回重试，在读锁出等待该线程更新完成。持有锁的线程更新完缓存后，会在释放锁前恢复该标志为false</span><br><span class="line">  if (!rediscovering) &#123;</span><br><span class="line">    try &#123;</span><br><span class="line">      w.lock();</span><br><span class="line">      rediscovering = true;</span><br><span class="line"></span><br><span class="line">      if (jedis != null) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">          // 通过cluster slots命令获取新的槽位信息，更新缓存</span><br><span class="line">          discoverClusterSlots(jedis);</span><br><span class="line">          return;</span><br><span class="line">        &#125; catch (JedisException e) &#123;</span><br><span class="line">          // 如果当前连接更新缓存发生JedisException，则从所有节点重试更新</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      for (JedisPool jp : getShuffledNodesPool()) &#123;</span><br><span class="line">        try &#123;</span><br><span class="line">          jedis = jp.getResource();</span><br><span class="line">          discoverClusterSlots(jedis);</span><br><span class="line">          return;</span><br><span class="line">        &#125; catch (JedisConnectionException e) &#123;</span><br><span class="line">          // 重试下一个节点</span><br><span class="line">        &#125; finally &#123;</span><br><span class="line">          if (jedis != null) &#123;</span><br><span class="line">            jedis.close();</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">      // 恢复标志位，释放锁</span><br><span class="line">      rediscovering = false;</span><br><span class="line">      w.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>JedisCluster使用读写锁保证cache数据的线程安全，所以在某个线程更新cache的时候，其他线程在读取cache中的槽位映射时会被阻塞。《Redis开发与运维》书中，付磊大大认为此处尚可优化，将cluster slots命令执行放在加写锁前，同时与本地缓存判断是否相同，不同则意味着必须更新，这时再去加写锁，从而缩短对其他线程的阻塞时间，尽量减少对操作槽位的缓存无误部分的影响。</p>
+<h2 id="2-3-多键操作与脚本执行"><a href="#2-3-多键操作与脚本执行" class="headerlink" title="2.3 多键操作与脚本执行"></a>2.3 多键操作与脚本执行</h2><p>在初始化工作部分看JedisCluster的类图时提到过，其实现了MultiKeyJedisClusterCommands和JedisClusterScriptingCommands两个接口规定的多键操作命令和脚本执行命令。到这里大家都知道集群模式下不同key可能存储于不同的槽位上，那么一次操作涉及多个key就意味着可能涉及多个节点。</p>
+<p>JedisCluster执行命令的模式是从connectionHandler获取链接，由JedisClusterCommand的匿名内部类去拿链接（Jedis实例）执行具体的命令，这个流程跟单键命令是一致的。不同的是，多key操作调用的是JedisClusterCommand.run(keys.length, keys)方法。相同的是，最终都是由 runWithRetries(<strong>byte</strong>[] key, *<em>int *</em>attempts, *<em>boolean *</em>tryRandomNode, *<em>boolean *</em>asking) 完成操作。</p>
+<p>这里以多个key的exists命令为例，代码如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">JedisCluster.java</span><br><span class="line"></span><br><span class="line">@Override</span><br><span class="line">public Long exists(final String... keys) &#123;</span><br><span class="line">  return new JedisClusterCommand&lt;Long&gt;(connectionHandler, maxAttempts) &#123;</span><br><span class="line">    @Override</span><br><span class="line">    public Long execute(Jedis connection) &#123;</span><br><span class="line">      return connection.exists(keys);</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;.run(keys.length, keys);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">JedisClusterCommand.java</span><br><span class="line"></span><br><span class="line">public T run(int keyCount, String... keys) &#123;</span><br><span class="line">  if (keys == null || keys.length == 0) &#123;</span><br><span class="line">    throw new JedisClusterException(&quot;No way to dispatch this command to Redis Cluster.&quot;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  if (keys.length &gt; 1) &#123;</span><br><span class="line">    int slot = JedisClusterCRC16.getSlot(keys[0]);</span><br><span class="line">    for (int i = 1; i &lt; keyCount; i++) &#123;</span><br><span class="line">      int nextSlot = JedisClusterCRC16.getSlot(keys[i]);</span><br><span class="line">      if (slot != nextSlot) &#123;</span><br><span class="line">        throw new JedisClusterException(&quot;No way to dispatch this command to Redis Cluster &quot;</span><br><span class="line">            + &quot;because keys have different slots.&quot;);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  return runWithRetries(SafeEncoder.encode(keys[0]), this.maxAttempts, false, false);</span><br><span class="line">&#125;</span><br><span class="line">复制代码</span><br></pre></td></tr></table></figure>
+
+<p>代码很简单易懂，对于多个key它会先检查是不是位于一个槽位，确定是一个槽位后就会拿着第一个key去计算slot并向connectionHandler要jedis实例。因此<strong>JedisCluster不支持不在同一个槽位的多key操作（实际上redis集群本就不提供此功能）</strong>。若调用多key命令方法时传入的多个key不是同一个slot，会抛出JedisClu-sterException，并且告诉你没办法调度命令去集群执行，因为这些key位于不同的slot。</p>
+<p>在实际开发中，如果明确知道某类key会存在多键操作，我们可以在存储时便通过打hashtag的方式强制其位于同一个slot同一个节点。另外，若真正需要操作多节点上的key时，可以通过遍历cache中缓存的节点到连接池的映射，在每个<strong>主节点</strong>上一次执行。</p>
+<p>脚本的执行实际上也是依赖于jedis去做的，这里不深入jedis去说了。脚本的执行也分涉及单个key和多个key两种情况，但其原理和上述一致。因此，<strong>JedisCluster也不支持涉及不同slot上多个key的脚本</strong>。</p>
+<h2 id="2-4-类结构回顾"><a href="#2-4-类结构回顾" class="headerlink" title="2.4 类结构回顾"></a>2.4 类结构回顾</h2><p>JedisCluster涉及的几个类如下图：</p>
+<p><img src="/2020/08/03/redisCluster/16b6b14efc99433c" alt="图片"></p>
+<p>JedisCommand封装集群命令的执行抽象出两种基本模式，单key和多key。个人理解这里的编码思想采用了模板方法模式，封装基本执行流程，具体的执行由实现类去根据具体的需求调用实际的api做实现。</p>
+<p>JedisCluster是面向开发人员的API类，实现三类命令接口，提供友好的方法供业务代码调用。</p>
+<p>JedisClusterConnectionHandler负责多个连接池的路由工作，根据缓存的映射关系，确定一个正确的连接池并返回其引用给上层。JedisSlotBasedConnectionHandler实际上只是基于父类的基本功能进行加工，提供给上层友好的调用方法，直接返回上层需要的连接。</p>
+<h3 id="init图"><a href="#init图" class="headerlink" title="init图"></a>init图</h3><p><img src="/2020/08/03/redisCluster/cluster-init.png" alt></p>
+<h3 id="get图"><a href="#get图" class="headerlink" title="get图"></a>get图</h3><p><img src="/2020/08/03/redisCluster/1596366417834.png" alt="1596366417834"></p>
+<p>接上图右二.    右三没截全,finally里是归还Jedis</p>
+<p><img src="/2020/08/03/redisCluster/1596366468948.png" alt="1596366468948"></p>
+<h1 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h1><p>Redis集群通过分片存储、主从数据复制以及合理科学的故障转移策略，提供了更强的性能、更好的扩展性以及可用性，满足了CAP定理的AP两个特性。对于一致性，集群模式配合客户端策略可以说实现了“弱一致性”。笔者认为实际开发中，是真的有必要去把这些东西都搞清楚再去使用，这样可以提前避免很多线上问题的产生。本篇文章重在梳理，个人感觉哪怕是根据已有的资料，去梳理出一篇经过自己多方验证、深度思考的文章比只是去看会对相关技术理解的更为深刻。</p>
+
+    </div>
+
+    
+    
+    
+        
+      
+
+      <footer class="post-footer">
+
+        
+
+          <div class="post-nav">
+            <div class="post-nav-next post-nav-item">
+              
+                <a href="/2020/08/03/常用命令/" rel="next" title="">
+                  <i class="fa fa-chevron-left"></i> 
+                </a>
+              
+            </div>
+
+            <span class="post-nav-divider"></span>
+
+            <div class="post-nav-prev post-nav-item">
+              
+            </div>
+          </div>
+        
+      </footer>
+    
+  </div>
+  
+  
+  
+  </article>
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+        
+        
+        
+        
+      
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#你不知道的Redis：RedisCluster与JedisCluster"><span class="nav-number">1.</span> <span class="nav-text">你不知道的Redis：RedisCluster与JedisCluster</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">2.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#一、RedisCluster"><span class="nav-number">3.</span> <span class="nav-text">一、RedisCluster</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#1-1-数据如何读写"><span class="nav-number">3.1.</span> <span class="nav-text">1.1 数据如何读写</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-2-节点间的信息共享"><span class="nav-number">3.2.</span> <span class="nav-text">1.2 节点间的信息共享</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-3-槽位迁移与集群伸缩"><span class="nav-number">3.3.</span> <span class="nav-text">1.3 槽位迁移与集群伸缩</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-4-高可用"><span class="nav-number">3.4.</span> <span class="nav-text">1.4 高可用</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#1-5-从节点坎坷晋升路"><span class="nav-number">3.5.</span> <span class="nav-text">1.5 从节点坎坷晋升路</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#二、JedisCluster"><span class="nav-number">4.</span> <span class="nav-text">二、JedisCluster</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#2-1-初始化工作"><span class="nav-number">4.1.</span> <span class="nav-text">2.1 初始化工作</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-2-键操作详解"><span class="nav-number">4.2.</span> <span class="nav-text">2.2 键操作详解</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-3-多键操作与脚本执行"><span class="nav-number">4.3.</span> <span class="nav-text">2.3 多键操作与脚本执行</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#2-4-类结构回顾"><span class="nav-number">4.4.</span> <span class="nav-text">2.4 类结构回顾</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#init图"><span class="nav-number">4.4.1.</span> <span class="nav-text">init图</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#get图"><span class="nav-number">4.4.2.</span> <span class="nav-text">get图</span></a></li></ol></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#总结"><span class="nav-number">5.</span> <span class="nav-text">总结</span></a></li></ol></div>
+        
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Swen</p>
+  <div class="site-description" itemprop="description">rain drop dida dida ~~~</div>
+</div>
+  <nav class="site-state motion-element">
+      <div class="site-state-item site-state-posts">
+        
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+    
+      
+      
+      <div class="site-state-item site-state-tags">
+        
+        <span class="site-state-item-count">3</span>
+        <span class="site-state-item-name">标签</span>
+        
+      </div>
+    
+  </nav>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Swen</span>
+</div>
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.9.0</div>
+  <span class="post-meta-divider">|</span>
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Gemini</a> v7.4.0</div>
+
+
+
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-user"></i>
+    </span>
+    <span class="site-uv" title="总访客量">
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+    </span>
+  
+    <span class="post-meta-divider">|</span>
+  
+    <span class="post-meta-item-icon">
+      <i class="fa fa-eye"></i>
+    </span>
+    <span class="site-pv" title="总访问量">
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+
+
+  <script src="/lib/anime.min.js?v=3.1.0"></script>
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+<script src="/js/utils.js?v=7.4.0"></script><script src="/js/motion.js?v=7.4.0"></script>
+<script src="/js/schemes/pisces.js?v=7.4.0"></script>
+
+<script src="/js/next-boot.js?v=7.4.0"></script>
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+  
+
+</body>
+</html>
